@@ -1,3 +1,15 @@
+# 1.0.0 (2021-02-28)
+
+
+### Bug Fixes
+
+* reference to a renamed index file ([c3dece7](https://github.com/promotedai/promoted-snowplow-logger/commit/c3dece7017b228e6431adb35d7d84a938d5313ef))
+
+
+### Features
+
+* rename `promoted-event-logger-ts` to `promoted-snowplow-logger` ([d6f95b2](https://github.com/promotedai/promoted-snowplow-logger/commit/d6f95b28655452ea69341960266a02018dbd9636))
+
 # [2.1.0](https://github.com/promotedai/promoted-event-logger-ts/compare/v2.0.1...v2.1.0) (2021-02-28)
 
 

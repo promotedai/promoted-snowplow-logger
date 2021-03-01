@@ -2,7 +2,6 @@ import copy from 'rollup-plugin-copy';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import typescript from 'rollup-plugin-typescript2';
-import postcss from 'rollup-plugin-postcss';
 import del from 'rollup-plugin-delete';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 import pkg from './package.json';
@@ -21,17 +20,6 @@ export default [
       del({ targets: 'dist/*' }),
       typescript({
         typescript: require('typescript'),
-      }),
-      /*
-      babel({
-          exclude: 'node_modules/**',
-          extensions,
-      }),
-      */
-      postcss({
-        modules: true,
-        plugins: [],
-        extract: resolve(`dist/${pkg.name}.css`),
       }),
       copy({
         targets: [

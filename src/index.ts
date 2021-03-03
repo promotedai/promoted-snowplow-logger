@@ -348,9 +348,6 @@ export class EventLoggerImpl implements EventLogger {
   logUser(user: User) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    if (this.isDebugEnabled) {
-      console.log(`EventLogger.logUser`);
-    }
 
     // This version of the snowplow method allows us to get access to `cf`.
     this.snowplow(function () {
@@ -371,9 +368,11 @@ export class EventLoggerImpl implements EventLogger {
       // Only send the log events if the userId changes.
       const newUserHash = hash(user);
       if (this.isDebugEnabled) {
-        console.log(
-          `EventLogger.logUser - sessionId=${sessionId}, oldSessionId=${oldSessionId}, newUserHash=${newUserHash}, oldUserHash=${oldUserHash}`
-        );
+        // Avoid extra strings in client-side libraries.  Just log raw params.
+        console.log(sessionId);
+        console.log(oldSessionId);
+        console.log(newUserHash);
+        console.log(oldUserHash);
       }
       if (sessionId !== oldSessionId || newUserHash !== oldUserHash) {
         this.snowplow('trackUnstructEvent', {

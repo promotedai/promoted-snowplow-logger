@@ -59,57 +59,30 @@ export interface EventLoggerArguments {
   userHashLocalStorageKey?: string;
 }
 
-export interface User {
-  common: {};
-}
+// TODO - auto-gen type from proto.
+export type User = any;
 
-export interface CohortMembership {
-  common: {};
-}
+// TODO - auto-gen type from proto.
+export type CohortMembership = any;
 
-export interface View {
-  common: {};
-}
+// TODO - auto-gen type from proto.
+export type View = any;
 
-export interface CommonRequest {
-  // viewId gets filled in on the server.
-  requestId: string;
-}
+// TODO - auto-gen type from proto.
+export type Request = any;
 
-export interface Request {
-  common: CommonRequest;
-}
+// TODO - auto-gen type from proto.
+export type Insertion = any;
 
-export interface CommonInsertion {
-  // TODO - specify requestId.
-  insertionId: string;
-}
+// TODO - auto-gen type from proto.
+export type Impression = any;
 
-export interface Insertion {
-  common: CommonInsertion;
-}
-
-export interface CommonImpression {
-  // TODO - specify insertion.
-  impressionId: string;
-}
-
-export interface Impression {
-  common: CommonImpression;
-}
+// TODO - auto-gen type from proto.
+export type Action = any;
 
 export interface Click {
-  /**
-   * The impressionId for the content (if content was clicked on).
-   */
-  impressionId?: string;
-  /**
-   * The target URL.  For actions on the same page, you can use '#action'.
-   */
+  impressionId: string;
   targetUrl: string;
-  /**
-   * The target URL.  For actions on the same page, you can use '#action'.
-   */
   elementId: string;
 }
 
@@ -127,7 +100,7 @@ export interface LocalStorage {
 /**
  * Returns the contexts for clicks given the parameters.
  */
-const getClickContexts = (impressionId: string | undefined) => {
+const getImpressionContexts = (impressionId: string | undefined) => {
   if (impressionId) {
     return [
       {
@@ -260,6 +233,7 @@ export class EventLoggerImpl implements EventLogger {
   private requestIgluSchema?: string;
   private insertionIgluSchema?: string;
   private impressionIgluSchema?: string;
+  private actionIgluSchema?: string;
 
   private handleLogError: (err: Error) => void;
   private snowplow: (...args: any[]) => void;
@@ -343,6 +317,16 @@ export class EventLoggerImpl implements EventLogger {
       this.impressionIgluSchema = `iglu:ai.promoted.${this.platformName}/impression/jsonschema/1-0-0`;
     }
     return this.impressionIgluSchema;
+  }
+
+  /**
+   * Returns the Action IGLU Schema URL.  As a function to delay string construction.
+   */
+  private getActionIgluSchema() {
+    if (!this.actionIgluSchema) {
+      this.actionIgluSchema = `iglu:ai.promoted.${this.platformName}/action/jsonschema/1-0-0`;
+    }
+    return this.actionIgluSchema;
   }
 
   logUser(user: User) {
@@ -441,9 +425,20 @@ export class EventLoggerImpl implements EventLogger {
     }
   }
 
+  logAction(action: Action) {
+    try {
+      this.snowplow('trackUnstructEvent', {
+        schema: this.getActionIgluSchema(),
+        data: action,
+      });
+    } catch (error) {
+      this.handleLogError(error);
+    }
+  }
+
   logClick({ impressionId, targetUrl, elementId }: Click) {
     try {
-      this.snowplow('trackLinkClick', targetUrl, elementId, [], '', '', getClickContexts(impressionId));
+      this.snowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
     } catch (error) {
       this.handleLogError(error);
     }

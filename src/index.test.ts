@@ -136,7 +136,7 @@ describe('logUser', () => {
         return [, , , , , , 'session-id1'];
       },
     };
-    expect(() => logger.innerLogUser(cf, user)).toThrow(/^Inner fail: Failed$/);
+    expect(() => logger.innerLogUser(cf, user)).toThrow(/^Inner fail: Inner fail: Failed$/);
   });
 });
 
@@ -487,5 +487,21 @@ describe('logClick', () => {
       elementId: 'element-id',
     };
     expect(() => logger.logClick(click)).toThrow(/^Inner fail: Failed$/);
+  });
+});
+
+describe('tryFlush', () => {
+  it('success', () => {
+    const snowplow = jest.fn();
+    const logger = createEventLogger({
+      platformName,
+      handleLogError: (err: Error) => {
+        throw err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+    // Does nothing.
+    logger.tryFlush();
   });
 });

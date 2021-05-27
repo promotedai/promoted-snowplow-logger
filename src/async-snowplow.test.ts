@@ -11,9 +11,7 @@ describe('ImmediateAsyncSnowplow', () => {
       });
       const event = { fake: 'prop' };
       asyncSnowplow.call('trackUnstructEvent', event);
-      expect(snowplow.mock.calls.length).toBe(1);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event);
+      expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
     it('success', () => {
@@ -28,17 +26,18 @@ describe('ImmediateAsyncSnowplow', () => {
     });
   });
 
-  it('tryFlush', () => {
+  it('flushEarlyEvents', () => {
     const snowplow = jest.fn();
     const asyncSnowplow = new ImmediateAsyncSnowplow(snowplow, (e) => {
       throw e;
     });
-    asyncSnowplow.tryFlush();
+    asyncSnowplow.flushEarlyEvents();
     // Nothing should happen.
+    expect(snowplow).not.toHaveBeenCalled();
   });
 });
 
-// Call ends up testing tryFlush and createTimerIfNeeded.
+// Call ends up testing flushEarlyEvents and createTimerIfNeeded.
 describe('TimerAsyncSnowplow - call', () => {
   describe('success', () => {
     it('immediate', () => {
@@ -51,9 +50,7 @@ describe('TimerAsyncSnowplow - call', () => {
       );
       const event = { fake: 'prop' };
       asyncSnowplow.call('trackUnstructEvent', event);
-      expect(snowplow.mock.calls.length).toBe(1);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event);
+      expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
     it('timer', () => {
@@ -68,9 +65,7 @@ describe('TimerAsyncSnowplow - call', () => {
       asyncSnowplow.call('trackUnstructEvent', event);
       snowplow = jest.fn();
       jest.runAllTimers();
-      expect(snowplow.mock.calls.length).toBe(1);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event);
+      expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
     it('timer 3x', () => {
@@ -87,16 +82,17 @@ describe('TimerAsyncSnowplow - call', () => {
       asyncSnowplow.call('trackUnstructEvent', event1);
       snowplow = jest.fn();
       jest.runAllTimers();
-      expect(snowplow.mock.calls.length).toBe(2);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event0);
-      expect(snowplow.mock.calls[1][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[1][1]).toEqual(event1);
+      expect(snowplow.mock.calls).toEqual([
+        ['trackUnstructEvent', event0],
+        ['trackUnstructEvent', event1],
+      ]);
       const event2 = { fake: 'prop2' };
       asyncSnowplow.call('trackUnstructEvent', event2);
-      expect(snowplow.mock.calls.length).toBe(3);
-      expect(snowplow.mock.calls[2][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[2][1]).toEqual(event2);
+      expect(snowplow.mock.calls).toEqual([
+        ['trackUnstructEvent', event0],
+        ['trackUnstructEvent', event1],
+        ['trackUnstructEvent', event2],
+      ]);
     });
   });
 
@@ -136,11 +132,10 @@ describe('TimerAsyncSnowplow - call', () => {
         i++;
       });
       expect(() => jest.runAllTimers()).toThrow(/^Failed$/);
-      expect(snowplow.mock.calls.length).toBe(2);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event0);
-      expect(snowplow.mock.calls[1][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[1][1]).toEqual(event1);
+      expect(snowplow.mock.calls).toEqual([
+        ['trackUnstructEvent', event0],
+        ['trackUnstructEvent', event1],
+      ]);
       const event2 = { fake: 'prop2' };
       expect(() => asyncSnowplow.call('trackUnstructEvent', event2)).toThrow(/^Failed$/);
     });
@@ -162,9 +157,7 @@ describe('TimerAsyncSnowplow - call', () => {
       }
       snowplow = jest.fn();
       jest.runAllTimers();
-      expect(snowplow.mock.calls.length).toBe(1);
-      expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-      expect(snowplow.mock.calls[0][1]).toEqual(event);
+      expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
     it('exceed max', () => {

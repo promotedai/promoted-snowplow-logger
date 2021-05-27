@@ -12,7 +12,7 @@ export interface AsyncSnowplow {
   /**
    * Tries to flush the queue if Snowplow is setup.
    */
-  tryFlush(): void;
+  flushEarlyEvents(): void;
 }
 
 /**
@@ -36,7 +36,7 @@ export class ImmediateAsyncSnowplow implements AsyncSnowplow {
     }
   }
 
-  tryFlush() {
+  flushEarlyEvents() {
     // Do nothing.
   }
 }
@@ -74,7 +74,7 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
     }
   }
 
-  tryFlush() {
+  flushEarlyEvents() {
     if (this.queue.length > 0) {
       try {
         const snowplow = this.snowplowProvider();
@@ -111,7 +111,7 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
         this.numTimerAttempts++;
         this.timer = setTimeout(() => {
           this.timer = undefined;
-          this.tryFlush();
+          this.flushEarlyEvents();
         }, SLEEP_DURATION_MS);
       }
     }

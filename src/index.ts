@@ -182,7 +182,7 @@ interface EventLogger {
   /**
    * Flush any Snowplow events that have been queued up in the EventLogger.
    */
-  tryFlush(): void;
+  flushEarlyEvents(): void;
 }
 
 export const createEventLogger = (args: EventLoggerArguments) => {
@@ -228,7 +228,7 @@ export class NoopEventLogger implements EventLogger {
     /* No op. */
   }
 
-  tryFlush() {
+  flushEarlyEvents() {
     /* No op. */
   }
 }
@@ -430,7 +430,7 @@ export class EventLoggerImpl implements EventLogger {
     this.snowplow.call('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
   }
 
-  tryFlush() {
-    this.snowplow.tryFlush();
+  flushEarlyEvents() {
+    this.snowplow.flushEarlyEvents();
   }
 }

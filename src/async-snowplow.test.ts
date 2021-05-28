@@ -3,6 +3,10 @@ import { ImmediateAsyncSnowplow, TimerAsyncSnowplow } from './async-snowplow';
 jest.useFakeTimers();
 
 describe('ImmediateAsyncSnowplow', () => {
+  afterEach(() => {
+    jest.runAllTimers();
+  });
+
   describe('call', () => {
     it('success', () => {
       const snowplow = jest.fn();
@@ -10,7 +14,7 @@ describe('ImmediateAsyncSnowplow', () => {
         throw e;
       });
       const event = { fake: 'prop' };
-      asyncSnowplow.call('trackUnstructEvent', event);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event);
       expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
@@ -22,7 +26,7 @@ describe('ImmediateAsyncSnowplow', () => {
         throw e;
       });
       const event = { fake: 'prop' };
-      expect(() => asyncSnowplow.call('trackUnstructEvent', event)).toThrow(/^Failed$/);
+      expect(() => asyncSnowplow.callSnowplow('trackUnstructEvent', event)).toThrow(/^Failed$/);
     });
   });
 
@@ -39,7 +43,15 @@ describe('ImmediateAsyncSnowplow', () => {
 
 // Call ends up testing flushEarlyEvents and createTimerIfNeeded.
 describe('TimerAsyncSnowplow - call', () => {
+  afterEach(() => {
+    jest.runAllTimers();
+  });
+
   describe('success', () => {
+    afterEach(() => {
+      jest.runAllTimers();
+    });
+
     it('immediate', () => {
       const snowplow = jest.fn();
       const asyncSnowplow = new TimerAsyncSnowplow(
@@ -49,7 +61,7 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event = { fake: 'prop' };
-      asyncSnowplow.call('trackUnstructEvent', event);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event);
       expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
@@ -62,7 +74,7 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event = { fake: 'prop' };
-      asyncSnowplow.call('trackUnstructEvent', event);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event);
       snowplow = jest.fn();
       jest.runAllTimers();
       expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
@@ -77,9 +89,9 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event0 = { fake: 'prop0' };
-      asyncSnowplow.call('trackUnstructEvent', event0);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event0);
       const event1 = { fake: 'prop1' };
-      asyncSnowplow.call('trackUnstructEvent', event1);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event1);
       snowplow = jest.fn();
       jest.runAllTimers();
       expect(snowplow.mock.calls).toEqual([
@@ -87,7 +99,7 @@ describe('TimerAsyncSnowplow - call', () => {
         ['trackUnstructEvent', event1],
       ]);
       const event2 = { fake: 'prop2' };
-      asyncSnowplow.call('trackUnstructEvent', event2);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event2);
       expect(snowplow.mock.calls).toEqual([
         ['trackUnstructEvent', event0],
         ['trackUnstructEvent', event1],
@@ -97,6 +109,10 @@ describe('TimerAsyncSnowplow - call', () => {
   });
 
   describe('error', () => {
+    afterEach(() => {
+      jest.runAllTimers();
+    });
+
     it('immediate', () => {
       const snowplow = jest.fn(() => {
         throw 'Failed';
@@ -108,7 +124,7 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event = { fake: 'prop' };
-      expect(() => asyncSnowplow.call('trackUnstructEvent', event)).toThrow(/^Failed$/);
+      expect(() => asyncSnowplow.callSnowplow('trackUnstructEvent', event)).toThrow(/^Failed$/);
     });
 
     it('timer 3x', () => {
@@ -120,9 +136,9 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event0 = { fake: 'prop0' };
-      asyncSnowplow.call('trackUnstructEvent', event0);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event0);
       const event1 = { fake: 'prop1' };
-      asyncSnowplow.call('trackUnstructEvent', event1);
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event1);
       let i = 0;
       snowplow = jest.fn(() => {
         // Fail every other call.
@@ -137,11 +153,15 @@ describe('TimerAsyncSnowplow - call', () => {
         ['trackUnstructEvent', event1],
       ]);
       const event2 = { fake: 'prop2' };
-      expect(() => asyncSnowplow.call('trackUnstructEvent', event2)).toThrow(/^Failed$/);
+      expect(() => asyncSnowplow.callSnowplow('trackUnstructEvent', event2)).toThrow(/^Failed$/);
     });
   });
 
   describe('test max attempt', () => {
+    afterEach(() => {
+      jest.runAllTimers();
+    });
+
     it('right before the max', () => {
       let snowplow: any = undefined;
       const asyncSnowplow = new TimerAsyncSnowplow(
@@ -151,12 +171,12 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event = { fake: 'prop' };
-      asyncSnowplow.call('trackUnstructEvent', event);
-      for (let i = 0; i < 14; i++) {
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event);
+      for (let i = 0; i < 9; i++) {
         jest.runOnlyPendingTimers();
       }
       snowplow = jest.fn();
-      jest.runAllTimers();
+      jest.runOnlyPendingTimers();
       expect(snowplow.mock.calls).toEqual([['trackUnstructEvent', event]]);
     });
 
@@ -169,8 +189,8 @@ describe('TimerAsyncSnowplow - call', () => {
         }
       );
       const event = { fake: 'prop' };
-      asyncSnowplow.call('trackUnstructEvent', event);
-      for (let i = 0; i < 14; i++) {
+      asyncSnowplow.callSnowplow('trackUnstructEvent', event);
+      for (let i = 0; i < 9; i++) {
         jest.runOnlyPendingTimers();
       }
       expect(() => jest.runOnlyPendingTimers()).toThrow(/^Max Snow timers exceeded$/);

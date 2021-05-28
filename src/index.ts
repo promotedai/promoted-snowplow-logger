@@ -349,7 +349,7 @@ export class EventLoggerImpl implements EventLogger {
     const self = this;
 
     // This version of the snowplow method allows us to get access to `cf`.
-    this.snowplow.call(function () {
+    this.snowplow.callSnowplow(function () {
       // We use cf to get sessionId.
       // @ts-expect-error Snowplow docs recommend this calling pattern.
       self.innerLogUser(this.cf, user);
@@ -374,7 +374,7 @@ export class EventLoggerImpl implements EventLogger {
         console.log(oldUserHash);
       }
       if (sessionId !== oldSessionId || newUserHash !== oldUserHash) {
-        this.snowplow.call('trackUnstructEvent', {
+        this.snowplow.callSnowplow('trackUnstructEvent', {
           schema,
           data: user,
         });
@@ -387,47 +387,47 @@ export class EventLoggerImpl implements EventLogger {
   }
 
   logCohortMembership(cohortMembership: CohortMembership) {
-    this.snowplow.call('trackUnstructEvent', {
+    this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getCohortMembershipIgluSchema(),
       data: cohortMembership,
     });
   }
 
   logView(view: View) {
-    this.snowplow.call('trackPageView', null, getViewContexts(view));
+    this.snowplow.callSnowplow('trackPageView', null, getViewContexts(view));
   }
 
   logRequest(request: Request) {
     // Q - should I add viewId here on the server?
-    this.snowplow.call('trackUnstructEvent', {
+    this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getRequestIgluSchema(),
       data: request,
     });
   }
 
   logInsertion(insertion: Insertion) {
-    this.snowplow.call('trackUnstructEvent', {
+    this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getInsertionIgluSchema(),
       data: insertion,
     });
   }
 
   logImpression(impression: Impression) {
-    this.snowplow.call('trackUnstructEvent', {
+    this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getImpressionIgluSchema(),
       data: impression,
     });
   }
 
   logAction(action: Action) {
-    this.snowplow.call('trackUnstructEvent', {
+    this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getActionIgluSchema(),
       data: action,
     });
   }
 
   logClick({ impressionId, targetUrl, elementId }: Click) {
-    this.snowplow.call('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
+    this.snowplow.callSnowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
   }
 
   flushEarlyEvents() {

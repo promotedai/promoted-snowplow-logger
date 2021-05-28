@@ -7,7 +7,7 @@ export interface AsyncSnowplow {
   /**
    * Same as calling Snowplow but will queue the events if Snowplow is not loaded.
    */
-  call(...args: any[]): void;
+  callSnowplow(...args: any[]): void;
 
   /**
    * Tries to flush the queue if Snowplow is setup.
@@ -28,7 +28,7 @@ export class ImmediateAsyncSnowplow implements AsyncSnowplow {
     this.handleLogError = handleLogError;
   }
 
-  call(...args: any[]) {
+  callSnowplow(...args: any[]) {
     try {
       this.snowplow(...args);
     } catch (e) {
@@ -44,8 +44,8 @@ export class ImmediateAsyncSnowplow implements AsyncSnowplow {
 // @ts-expect-error window does not have snowplow on it.
 export const windowSnowplowProvider = () => typeof window !== 'undefined' && window?.snowplow;
 
-const SLEEP_DURATION_MS = 2000;
-const MAX_TIMER_ATTEMPTS = 15;
+const SLEEP_DURATION_MS = 3000;
+const MAX_TIMER_ATTEMPTS = 10;
 
 /**
  * An implementation of AsyncSnowplow that is backed by a timer.
@@ -63,7 +63,7 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
     this.queue = [];
   }
 
-  call(...args: any[]) {
+  callSnowplow(...args: any[]) {
     const snowplow = this.snowplowProvider();
     if (snowplow) {
       snowplow(...args);
@@ -79,17 +79,15 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
       try {
         const snowplow = this.snowplowProvider();
         if (snowplow) {
-          const newQueue: any[][] = [];
           let error: Error | undefined = undefined;
           this.queue.forEach((args) => {
             try {
               snowplow(...args);
             } catch (e) {
-              newQueue.push(args);
               error = e;
             }
           });
-          this.queue = newQueue;
+          this.queue = [];
           if (error !== undefined) {
             throw error;
           }

@@ -1,4 +1,11 @@
 import hash from 'object-hash';
+import {
+  AsyncSnowplow,
+  ImmediateAsyncSnowplow,
+  SnowplowFn,
+  TimerAsyncSnowplow,
+  windowSnowplowProvider,
+} from './async-snowplow';
 
 /**
  * Constructor arguments for EventLogger.
@@ -171,6 +178,11 @@ interface EventLogger {
    * Logs `click`.
    */
   logClick(click: Click): void;
+
+  /**
+   * Flush any Snowplow events that have been queued up in the EventLogger.
+   */
+  flushEarlyEvents(): void;
 }
 
 export const createEventLogger = (args: EventLoggerArguments) => {
@@ -215,7 +227,18 @@ export class NoopEventLogger implements EventLogger {
   logClick() {
     /* No op. */
   }
+
+  flushEarlyEvents() {
+    /* No op. */
+  }
 }
+
+const createAsyncSnowplow = (overrideSnowplow: SnowplowFn | undefined, handleLogError: (err: Error) => void) => {
+  if (overrideSnowplow) {
+    return new ImmediateAsyncSnowplow(overrideSnowplow, handleLogError);
+  }
+  return new TimerAsyncSnowplow(windowSnowplowProvider, handleLogError);
+};
 
 /**
  * A utility class for logging events.
@@ -236,7 +259,7 @@ export class EventLoggerImpl implements EventLogger {
   private actionIgluSchema?: string;
 
   private handleLogError: (err: Error) => void;
-  private snowplow: (...args: any[]) => void;
+  private snowplow: AsyncSnowplow;
   private localStorage?: LocalStorage;
   private userSessionLocalStorageKey: string;
   private userHashLocalStorageKey: string;
@@ -247,15 +270,7 @@ export class EventLoggerImpl implements EventLogger {
   public constructor(args: EventLoggerArguments) {
     this.platformName = args.platformName;
     this.handleLogError = args.handleLogError;
-    // @ts-expect-error window does not have snowplow on it.
-    const sp = args.snowplow || (typeof window !== 'undefined' && window?.snowplow);
-    this.snowplow = (...args: any[]) => {
-      // Delay the error in case the client is using NextJS.
-      if (!this.snowplow) {
-        throw Error(`snowplow needs to be set on EventLogger constructor arguments or accessible on window`);
-      }
-      sp(...args);
-    };
+    this.snowplow = createAsyncSnowplow(args.snowplow, args.handleLogError);
     this.localStorage = args.localStorage;
     if (this.localStorage === undefined && typeof window !== 'undefined') {
       this.localStorage = window?.localStorage;
@@ -334,7 +349,7 @@ export class EventLoggerImpl implements EventLogger {
     const self = this;
 
     // This version of the snowplow method allows us to get access to `cf`.
-    this.snowplow(function () {
+    this.snowplow.callSnowplow(function () {
       // We use cf to get sessionId.
       // @ts-expect-error Snowplow docs recommend this calling pattern.
       self.innerLogUser(this.cf, user);
@@ -359,7 +374,7 @@ export class EventLoggerImpl implements EventLogger {
         console.log(oldUserHash);
       }
       if (sessionId !== oldSessionId || newUserHash !== oldUserHash) {
-        this.snowplow('trackUnstructEvent', {
+        this.snowplow.callSnowplow('trackUnstructEvent', {
           schema,
           data: user,
         });
@@ -372,74 +387,50 @@ export class EventLoggerImpl implements EventLogger {
   }
 
   logCohortMembership(cohortMembership: CohortMembership) {
-    try {
-      this.snowplow('trackUnstructEvent', {
-        schema: this.getCohortMembershipIgluSchema(),
-        data: cohortMembership,
-      });
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackUnstructEvent', {
+      schema: this.getCohortMembershipIgluSchema(),
+      data: cohortMembership,
+    });
   }
 
   logView(view: View) {
-    try {
-      this.snowplow('trackPageView', null, getViewContexts(view));
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackPageView', null, getViewContexts(view));
   }
 
   logRequest(request: Request) {
-    try {
-      // Q - should I add viewId here on the server?
-      this.snowplow('trackUnstructEvent', {
-        schema: this.getRequestIgluSchema(),
-        data: request,
-      });
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    // Q - should I add viewId here on the server?
+    this.snowplow.callSnowplow('trackUnstructEvent', {
+      schema: this.getRequestIgluSchema(),
+      data: request,
+    });
   }
 
   logInsertion(insertion: Insertion) {
-    try {
-      this.snowplow('trackUnstructEvent', {
-        schema: this.getInsertionIgluSchema(),
-        data: insertion,
-      });
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackUnstructEvent', {
+      schema: this.getInsertionIgluSchema(),
+      data: insertion,
+    });
   }
 
   logImpression(impression: Impression) {
-    try {
-      this.snowplow('trackUnstructEvent', {
-        schema: this.getImpressionIgluSchema(),
-        data: impression,
-      });
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackUnstructEvent', {
+      schema: this.getImpressionIgluSchema(),
+      data: impression,
+    });
   }
 
   logAction(action: Action) {
-    try {
-      this.snowplow('trackUnstructEvent', {
-        schema: this.getActionIgluSchema(),
-        data: action,
-      });
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackUnstructEvent', {
+      schema: this.getActionIgluSchema(),
+      data: action,
+    });
   }
 
   logClick({ impressionId, targetUrl, elementId }: Click) {
-    try {
-      this.snowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
-    } catch (error) {
-      this.handleLogError(error);
-    }
+    this.snowplow.callSnowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
+  }
+
+  flushEarlyEvents() {
+    this.snowplow.flushEarlyEvents();
   }
 }

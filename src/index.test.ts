@@ -96,16 +96,19 @@ describe('logUser', () => {
     };
     logger.innerLogUser(cf, user);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-    expect(snowplow.mock.calls[0][1]).toEqual({
-      schema: 'iglu:ai.promoted.test/user/jsonschema/1-0-0',
-      data: {
-        common: {
-          logUserId: 'log-user-id',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/user/jsonschema/1-0-0',
+          data: {
+            common: {
+              logUserId: 'log-user-id',
+            },
+          },
         },
-      },
-    });
+      ],
+    ]);
     expect(localStorage.items).toEqual({
       'p-uh': '79fde9e6f22beefc8863cae0df052eb4dd56babf',
       'p-us': 'session-id1',
@@ -136,7 +139,7 @@ describe('logUser', () => {
         return [, , , , , , 'session-id1'];
       },
     };
-    expect(() => logger.innerLogUser(cf, user)).toThrow(/^Inner fail: Failed$/);
+    expect(() => logger.innerLogUser(cf, user)).toThrow(/^Inner fail: Inner fail: Failed$/);
   });
 });
 
@@ -160,17 +163,20 @@ describe('logCohortMembership', () => {
     } as CohortMembership;
     logger.logCohortMembership(cohortMembership);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-    expect(snowplow.mock.calls[0][1]).toEqual({
-      schema: 'iglu:ai.promoted.test/cohortmembership/jsonschema/1-0-0',
-      data: {
-        common: {
-          cohort_id: 'UNKNOWN_COHORT',
-          experimentGroup: 'EXPERIMENT',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/cohortmembership/jsonschema/1-0-0',
+          data: {
+            common: {
+              cohort_id: 'UNKNOWN_COHORT',
+              experimentGroup: 'EXPERIMENT',
+            },
+          },
         },
-      },
-    });
+      ],
+    ]);
   });
 
   it('error', () => {
@@ -215,18 +221,21 @@ describe('logView', () => {
     } as View;
     logger.logView(view);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackPageView');
-    expect(snowplow.mock.calls[0][1]).toEqual(null);
-    expect(snowplow.mock.calls[0][2]).toEqual([
-      {
-        data: {
-          common: {
-            useCase: 'SEARCH',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackPageView',
+        null,
+        [
+          {
+            data: {
+              common: {
+                useCase: 'SEARCH',
+              },
+            },
+            schema: 'iglu:ai.promoted/pageview_cx/jsonschema/2-0-0',
           },
-        },
-        schema: 'iglu:ai.promoted/pageview_cx/jsonschema/2-0-0',
-      },
+        ],
+      ],
     ]);
   });
 
@@ -273,18 +282,21 @@ describe('logRequest', () => {
     } as Request;
     logger.logRequest(request);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-    expect(snowplow.mock.calls[0][1]).toEqual({
-      schema: 'iglu:ai.promoted.test/request/jsonschema/1-0-0',
-      data: {
-        common: {
-          requestId: 'abc-xyz',
-          useCase: 'SEARCH',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/request/jsonschema/1-0-0',
+          data: {
+            common: {
+              requestId: 'abc-xyz',
+              useCase: 'SEARCH',
+            },
+            experimentOneGroup: 1,
+          },
         },
-        experimentOneGroup: 1,
-      },
-    });
+      ],
+    ]);
   });
 
   it('error', () => {
@@ -334,20 +346,23 @@ describe('logInsertion', () => {
     } as Insertion;
     logger.logInsertion(insertion);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-    expect(snowplow.mock.calls[0][1]).toEqual({
-      schema: 'iglu:ai.promoted.test/insertion/jsonschema/1-0-0',
-      data: {
-        common: {
-          contentId: '123',
-          insertionId: 'abc-xyz',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/insertion/jsonschema/1-0-0',
+          data: {
+            common: {
+              contentId: '123',
+              insertionId: 'abc-xyz',
+            },
+            shirt: {
+              color: 'blue',
+            },
+          },
         },
-        shirt: {
-          color: 'blue',
-        },
-      },
-    });
+      ],
+    ]);
   });
 
   it('error', () => {
@@ -396,17 +411,20 @@ describe('logImpression', () => {
     } as Impression;
     logger.logImpression(impression);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackUnstructEvent');
-    expect(snowplow.mock.calls[0][1]).toEqual({
-      schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
-      data: {
-        common: {
-          impressionId: 'abc-xyz',
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+          data: {
+            common: {
+              impressionId: 'abc-xyz',
+            },
+            timeMillis: 123456789,
+          },
         },
-        timeMillis: 123456789,
-      },
-    });
+      ],
+    ]);
   });
 
   it('error', () => {
@@ -451,20 +469,23 @@ describe('logClick', () => {
     };
     logger.logClick(click);
 
-    expect(snowplow.mock.calls.length).toBe(1);
-    expect(snowplow.mock.calls[0][0]).toEqual('trackLinkClick');
-    expect(snowplow.mock.calls[0][1]).toEqual('target-url');
-    expect(snowplow.mock.calls[0][2]).toEqual('element-id');
-    expect(snowplow.mock.calls[0][3]).toEqual([]);
-    expect(snowplow.mock.calls[0][4]).toEqual('');
-    expect(snowplow.mock.calls[0][5]).toEqual('');
-    expect(snowplow.mock.calls[0][6]).toEqual([
-      {
-        schema: 'iglu:ai.promoted/impression_cx/jsonschema/1-0-0',
-        data: {
-          impressionId: 'abc-xyz',
-        },
-      },
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackLinkClick',
+        'target-url',
+        'element-id',
+        [],
+        '',
+        '',
+        [
+          {
+            schema: 'iglu:ai.promoted/impression_cx/jsonschema/1-0-0',
+            data: {
+              impressionId: 'abc-xyz',
+            },
+          },
+        ],
+      ],
     ]);
   });
 
@@ -487,5 +508,22 @@ describe('logClick', () => {
       elementId: 'element-id',
     };
     expect(() => logger.logClick(click)).toThrow(/^Inner fail: Failed$/);
+  });
+});
+
+describe('flushEarlyEvents', () => {
+  it('success', () => {
+    const snowplow = jest.fn();
+    const logger = createEventLogger({
+      platformName,
+      handleLogError: (err: Error) => {
+        throw err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+    logger.flushEarlyEvents();
+    // Nothing should happen.
+    expect(snowplow).not.toHaveBeenCalled();
   });
 });

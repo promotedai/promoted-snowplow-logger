@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.0.0...v2.1.0) (2021-05-28)
+
+
+### Features
+
+* support async loading of snowplow script ([19e60d9](https://github.com/promotedai/promoted-snowplow-logger/commit/19e60d97fd1674393f0cb56906e145bd7593076d))
+
 # [2.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v1.0.0...v2.0.0) (2021-03-27)
 
 

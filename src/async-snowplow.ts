@@ -21,18 +21,18 @@ export interface AsyncSnowplow {
  */
 export class ImmediateAsyncSnowplow implements AsyncSnowplow {
   snowplow: SnowplowFn;
-  handleLogError: (err: Error) => void;
+  handleError: (err: Error) => void;
 
-  public constructor(snowplow: SnowplowFn, handleLogError: (err: Error) => void) {
+  public constructor(snowplow: SnowplowFn, handleError: (err: Error) => void) {
     this.snowplow = snowplow;
-    this.handleLogError = handleLogError;
+    this.handleError = handleError;
   }
 
   callSnowplow(...args: any[]) {
     try {
       this.snowplow(...args);
     } catch (e) {
-      this.handleLogError(e);
+      this.handleError(e);
     }
   }
 
@@ -52,14 +52,14 @@ const MAX_TIMER_ATTEMPTS = 10;
  */
 export class TimerAsyncSnowplow implements AsyncSnowplow {
   snowplowProvider: () => SnowplowFn | undefined;
-  handleLogError: (err: Error) => void;
+  handleError: (err: Error) => void;
   queue: any[][];
   timer: ReturnType<typeof setTimeout> | undefined;
   numTimerAttempts = 0;
 
-  public constructor(snowplowProvider: () => SnowplowFn | undefined, handleLogError: (err: Error) => void) {
+  public constructor(snowplowProvider: () => SnowplowFn | undefined, handleError: (err: Error) => void) {
     this.snowplowProvider = snowplowProvider;
-    this.handleLogError = handleLogError;
+    this.handleError = handleError;
     this.queue = [];
   }
 
@@ -96,7 +96,7 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
           this.createTimerIfNeeded();
         }
       } catch (e) {
-        this.handleLogError(e);
+        this.handleError(e);
       }
     }
   }
@@ -104,7 +104,7 @@ export class TimerAsyncSnowplow implements AsyncSnowplow {
   createTimerIfNeeded() {
     if (this.queue.length > 0 && !this.timer) {
       if (this.numTimerAttempts >= MAX_TIMER_ATTEMPTS) {
-        this.handleLogError(new Error('Max Snow timers exceeded'));
+        this.handleError(new Error('Max Snow timers exceeded'));
       } else {
         this.numTimerAttempts++;
         this.timer = setTimeout(() => {

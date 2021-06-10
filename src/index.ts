@@ -33,13 +33,11 @@ export interface EventLoggerArguments {
     process?.env?.NODE_ENV !== 'production' ||
     (typeof location !== "undefined" && location?.hostname === "localhost");
   ...
-  handleLogError: throwError ? (err) => {
-      throw error;
-    } : (err) => console.error(err);
+  handleError: throwError ? (err) => { throw error; } : console.error;
   }
   ```
   */
-  handleLogError: (err: Error) => void;
+  handleError: (err: Error) => void;
 
   /**
    * Used to override `window.snowplow` for testing.
@@ -233,11 +231,11 @@ export class NoopEventLogger implements EventLogger {
   }
 }
 
-const createAsyncSnowplow = (overrideSnowplow: SnowplowFn | undefined, handleLogError: (err: Error) => void) => {
+const createAsyncSnowplow = (overrideSnowplow: SnowplowFn | undefined, handleError: (err: Error) => void) => {
   if (overrideSnowplow) {
-    return new ImmediateAsyncSnowplow(overrideSnowplow, handleLogError);
+    return new ImmediateAsyncSnowplow(overrideSnowplow, handleError);
   }
-  return new TimerAsyncSnowplow(windowSnowplowProvider, handleLogError);
+  return new TimerAsyncSnowplow(windowSnowplowProvider, handleError);
 };
 
 /**
@@ -258,7 +256,7 @@ export class EventLoggerImpl implements EventLogger {
   private impressionIgluSchema?: string;
   private actionIgluSchema?: string;
 
-  private handleLogError: (err: Error) => void;
+  private handleError: (err: Error) => void;
   private snowplow: AsyncSnowplow;
   private localStorage?: LocalStorage;
   private userSessionLocalStorageKey: string;
@@ -269,8 +267,8 @@ export class EventLoggerImpl implements EventLogger {
    */
   public constructor(args: EventLoggerArguments) {
     this.platformName = args.platformName;
-    this.handleLogError = args.handleLogError;
-    this.snowplow = createAsyncSnowplow(args.snowplow, args.handleLogError);
+    this.handleError = args.handleError;
+    this.snowplow = createAsyncSnowplow(args.snowplow, args.handleError);
     this.localStorage = args.localStorage;
     if (this.localStorage === undefined && typeof window !== 'undefined') {
       this.localStorage = window?.localStorage;
@@ -382,7 +380,7 @@ export class EventLoggerImpl implements EventLogger {
         this.localStorage?.setItem(this.userHashLocalStorageKey, newUserHash);
       }
     } catch (error) {
-      this.handleLogError(error);
+      this.handleError(error);
     }
   }
 

@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.2.0...v3.0.0) (2021-06-10)
+
+
+* Another commit to force a breaking change. ([ccf103a](https://github.com/promotedai/promoted-snowplow-logger/commit/ccf103ac4d5d9746a941f01ae66ade844ee9c664))
+
+
+### BREAKING CHANGES
+
+* this syntax is very nitpicky
+
+TESTING=none
+
 # [2.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.1.0...v2.2.0) (2021-06-10)
 
 

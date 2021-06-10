@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.1.0...v2.2.0) (2021-06-10)
+
+
+### Features
+
+* rename handleLogError to handleError ([50c1274](https://github.com/promotedai/promoted-snowplow-logger/commit/50c127479e78a042c4d0a8e3f8ea45707d634a26))
+
 # [2.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.0.0...v2.1.0) (2021-05-28)
 
 

@@ -173,6 +173,11 @@ interface EventLogger {
   logImpression(impression: Impression): void;
 
   /**
+   * Logs `action`.
+   */
+  logAction(action: Action): void;
+
+  /**
    * Logs `click`.
    */
   logClick(click: Click): void;
@@ -219,6 +224,10 @@ export class NoopEventLogger implements EventLogger {
   }
 
   logImpression() {
+    /* No op. */
+  }
+
+  logAction() {
     /* No op. */
   }
 

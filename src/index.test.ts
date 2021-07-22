@@ -1,4 +1,5 @@
 import {
+  Action,
   Click,
   CohortMembership,
   createEventLogger,
@@ -447,6 +448,65 @@ describe('logImpression', () => {
       timeMillis: 123456789,
     } as Impression;
     expect(() => logger.logImpression(impression)).toThrow(/^Inner fail: Failed$/);
+  });
+});
+
+describe('logAction', () => {
+  it('success', () => {
+    const snowplow = jest.fn();
+    const logger = createEventLogger({
+      platformName,
+      handleError: (err: Error) => {
+        throw err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+
+    const action = {
+      timing: {
+        timeMillis: 123456789,
+      },
+      impressionId: 'abc-xyz',
+    } as Action;
+    logger.logAction(action);
+
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+          data: {
+            timing: {
+              timeMillis: 123456789,
+            },
+            impressionId: 'abc-xyz',
+          },
+        },
+      ],
+    ]);
+  });
+
+  it('error', () => {
+    const snowplow = jest.fn(() => {
+      throw 'Failed';
+    });
+    const logger = createEventLogger({
+      platformName,
+      handleError: (err: Error) => {
+        throw 'Inner fail: ' + err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+
+    const action = {
+      timing: {
+        timeMillis: 123456789,
+      },
+      impressionId: 'abc-xyz',
+    } as Action;
+    expect(() => logger.logAction(action)).toThrow(/^Inner fail: Failed$/);
   });
 });
 

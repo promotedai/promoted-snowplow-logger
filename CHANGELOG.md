@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v3.0.0...v3.1.0) (2021-07-22)
+
+
+### Features
+
+* expose logAction ([111925e](https://github.com/promotedai/promoted-snowplow-logger/commit/111925e56698e0339aadda97fda4519c4148b99d))
+
 # [3.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v2.2.0...v3.0.0) (2021-06-10)
 
 

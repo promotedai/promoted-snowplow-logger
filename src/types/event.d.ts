@@ -100,7 +100,7 @@ export type ImpressionSourceTypeString = 'UNKNOWN_IMPRESSION_SOURCE_TYPE' | 'DEL
 
 // TODO - auto-gen type from proto.
 export interface Action {
-  userInfo: UserInfo;
+  userInfo?: UserInfo;
   actionId?: string;
   impressionId?: string;
   insertionId?: string;

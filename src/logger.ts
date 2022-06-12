@@ -196,16 +196,17 @@ export class EventLoggerImpl implements EventLogger {
   };
 
   logClick = (click: Click) => {
-    const { targetUrl } = click;
     const action: Action = {
       actionType: 2,
       ...click,
     };
+    // Moves the `targetUrl` field to `navigateAction.targetUrl`
+    const { targetUrl } = click;
     delete action['targetUrl'];
-
     if (targetUrl) {
       action.navigateAction = { targetUrl };
     }
+
     this.logAction(action);
   };
 

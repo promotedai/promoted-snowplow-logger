@@ -183,7 +183,7 @@ export type ActionTypeString =
   | 'COMPLETE_SIGN_IN'
   | 'COMPLETE_SIGN_UP';
 
-// This is specific to this library.
+// This is not a proto.  This is an interface just for this library.
 export interface Click extends Action {
   targetUrl: string;
 }

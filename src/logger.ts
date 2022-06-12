@@ -144,7 +144,7 @@ export class EventLoggerImpl implements EventLogger {
     return this.actionIgluSchema;
   }
 
-  logUser(user: User) {
+  logUser = (user: User) => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
@@ -154,9 +154,9 @@ export class EventLoggerImpl implements EventLogger {
       // @ts-expect-error Snowplow docs recommend this calling pattern.
       self.innerLogUser(this.cf, user);
     });
-  }
+  };
 
-  innerLogUser(cf: any, user: User) {
+  innerLogUser = (cf: any, user: User) => {
     const schema = this.getUserIgluSchema();
     try {
       const domainUserInfo = cf.getDomainUserInfo();
@@ -184,38 +184,38 @@ export class EventLoggerImpl implements EventLogger {
     } catch (error) {
       this.handleError(error);
     }
-  }
+  };
 
-  logCohortMembership(cohortMembership: CohortMembership) {
+  logCohortMembership = (cohortMembership: CohortMembership) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getCohortMembershipIgluSchema(),
       data: cohortMembership,
     });
-  }
+  };
 
-  logView(view: View) {
+  logView = (view: View) => {
     this.snowplow.callSnowplow('trackPageView', null, getViewContexts(view));
-  }
+  };
 
-  logImpression(impression: Impression) {
+  logImpression = (impression: Impression) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getImpressionIgluSchema(),
       data: impression,
     });
-  }
+  };
 
-  logAction(action: Action) {
+  logAction = (action: Action) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getActionIgluSchema(),
       data: action,
     });
-  }
+  };
 
-  logClick({ impressionId, targetUrl, elementId }: Click) {
+  logClick = ({ impressionId, targetUrl, elementId }: Click) => {
     this.snowplow.callSnowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
-  }
+  };
 
-  flushEarlyEvents() {
+  flushEarlyEvents = () => {
     this.snowplow.flushEarlyEvents();
-  }
+  };
 }

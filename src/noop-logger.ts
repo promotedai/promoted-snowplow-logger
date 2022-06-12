@@ -7,31 +7,31 @@ import type { EventLogger } from './types/logger';
  * to reduce memory pressure.
  */
 export class NoopEventLogger implements EventLogger {
-  logUser() {
+  logUser = () => {
     /* No op. */
-  }
+  };
 
-  logCohortMembership() {
+  logCohortMembership = () => {
     /* No op. */
-  }
+  };
 
-  logView() {
+  logView = () => {
     /* No op. */
-  }
+  };
 
-  logImpression() {
+  logImpression = () => {
     /* No op. */
-  }
+  };
 
-  logAction() {
+  logAction = () => {
     /* No op. */
-  }
+  };
 
-  logClick() {
+  logClick = () => {
     /* No op. */
-  }
+  };
 
-  flushEarlyEvents() {
+  flushEarlyEvents = () => {
     /* No op. */
-  }
+  };
 }

@@ -312,20 +312,18 @@ describe('logClick', () => {
 
     expect(snowplow.mock.calls).toEqual([
       [
-        'trackLinkClick',
-        'target-url',
-        'element-id',
-        [],
-        '',
-        '',
-        [
-          {
-            schema: 'iglu:ai.promoted/impression_cx/jsonschema/1-0-0',
-            data: {
-              impressionId: 'abc-xyz',
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+          data: {
+            actionType: 2,
+            elementId: 'element-id',
+            impressionId: 'abc-xyz',
+            navigateAction: {
+              targetUrl: 'target-url',
             },
           },
-        ],
+        },
       ],
     ]);
   });

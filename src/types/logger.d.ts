@@ -1,4 +1,4 @@
-import type { Action, Click, CohortMembership, Impression, User, View } from './event';
+import type { Action, Click, CohortMembership, Impression, User, UserInfo, View } from './event';
 
 /**
  * Interface for EventLogger.  The logger better handles errors and
@@ -76,6 +76,19 @@ export interface EventLoggerArguments {
   ```
   */
   handleError: (err: Error) => void;
+
+  /**
+   * Can be used to set a base UserInfo across all records.
+   *
+   * Instead of using a setter, this uses a callback in case clients have a getter method
+   * where the underlying value can be updated.
+   *
+   * If both this base UserInfo and the record UserInfo is set, the UserInfos are
+   * merged and the record's UserInfos are preferred.
+   *
+   * This does not work with auto-link tracking.
+   */
+  getUserInfo?: () => UserInfo | undefined;
 
   /**
    * Used to override `window.snowplow` for testing.

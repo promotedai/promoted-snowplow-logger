@@ -3,15 +3,12 @@
 // https://github.com/promotedai/schema/blob/main/proto/event/event.proto
 // https://github.com/promotedai/schema/blob/main/proto/common/common.proto
 
-// TODO - auto-gen type from proto.
-export interface User {
-  userInfo?: UserInfo;
+export interface User extends HasUserInfo {
   properties?: Properties;
 }
 
 // TODO - auto-gen type from proto.
-export interface CohortMembership {
-  userInfo?: UserInfo;
+export interface CohortMembership extends HasUserInfo {
   membershipId?: string;
   cohortId?: string;
   arm?: CohortArmMap[keyof CohortArmMap] | CohortArmString;
@@ -32,8 +29,7 @@ export interface CohortArmMap {
 export type CohortArmString = 'UNKNOWN_GROUP' | 'CONTROL' | 'TREATMENT' | 'TREATMENT1' | 'TREATMENT2' | 'TREATMENT3';
 
 // TODO - auto-gen type from proto.
-export interface View {
-  userInfo?: UserInfo;
+export interface View extends HasUserInfo {
   viewId?: string;
   autoViewId?: string;
   sessionId?: string;
@@ -73,8 +69,7 @@ export type UseCaseString =
   | 'DISCOVER';
 
 // TODO - auto-gen type from proto.
-export interface Impression {
-  userInfo?: UserInfo;
+export interface Impression extends HasUserInfo {
   impressionId?: string;
   insertionId?: string;
   contentId?: string;
@@ -99,8 +94,7 @@ export interface ImpressionSourceTypeMap {
 export type ImpressionSourceTypeString = 'UNKNOWN_IMPRESSION_SOURCE_TYPE' | 'DELIVERY' | 'CLIENT_BACKEND';
 
 // TODO - auto-gen type from proto.
-export interface Action {
-  userInfo?: UserInfo;
+export interface Action extends HasUserInfo {
   actionId?: string;
   impressionId?: string;
   insertionId?: string;
@@ -190,10 +184,12 @@ export type ActionTypeString =
   | 'COMPLETE_SIGN_UP';
 
 // This is specific to this library.
-export interface Click {
-  impressionId: string;
+export interface Click extends Action {
   targetUrl: string;
-  elementId: string;
+}
+
+export interface HasUserInfo {
+  userInfo?: UserInfo;
 }
 
 export interface UserInfo {

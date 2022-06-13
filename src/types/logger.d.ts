@@ -70,7 +70,7 @@ export interface EventLoggerArguments {
    * const throwError =
    *   process?.env?.NODE_ENV !== 'production' ||
    *   (typeof location !== "undefined" && location?.hostname === "localhost");
-   * 
+   *
    * ...
    * handleError: throwError ? (err) => { throw error; } : console.error
    * ...
@@ -92,7 +92,7 @@ export interface EventLoggerArguments {
    *   })
    * }
    * ```
-   *  
+   *
    * If both this base UserInfo and the record UserInfo is set, the UserInfos are
    * merged and the record's UserInfos are preferred.
    *

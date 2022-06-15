@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.0.0...v4.1.0) (2022-06-15)
+
+
+### Features
+
+* bump minor version ([#15](https://github.com/promotedai/promoted-snowplow-logger/issues/15)) ([9ff7cde](https://github.com/promotedai/promoted-snowplow-logger/commit/9ff7cde3d92ce9d258ddd9df772425ed93efa64c))
+
 # [4.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v3.1.0...v4.0.0) (2022-06-15)
 
 

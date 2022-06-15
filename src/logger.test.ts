@@ -1,15 +1,5 @@
-import {
-  Action,
-  Click,
-  CohortMembership,
-  createEventLogger,
-  EventLoggerImpl,
-  Impression,
-  Insertion,
-  Request,
-  User,
-  View,
-} from '.';
+import type { Action, Click, CohortMembership, Impression, User, View } from './types/event';
+import { createEventLogger, EventLoggerImpl } from './logger';
 
 const platformName = 'test';
 
@@ -17,55 +7,6 @@ const mockLocalStorage = (items = {}) => ({
   items,
   getItem: (key: string) => items[key],
   setItem: (key: string, value: string) => (items[key] = value),
-});
-
-describe('disabled logging', () => {
-  it('disable', () => {
-    const snowplow = jest.fn();
-    const localStorage = mockLocalStorage({
-      'p-us': undefined,
-      'p-uh': undefined,
-    });
-    const logger = createEventLogger({
-      enabled: false,
-      platformName,
-      handleError: (err: Error) => {
-        throw err;
-      },
-      snowplow,
-      localStorage,
-    });
-
-    logger.logUser({
-      common: {},
-    });
-    logger.logCohortMembership({
-      common: {},
-    });
-    logger.logView({
-      common: {},
-    });
-    logger.logRequest({
-      common: {
-        requestId: 'requestId1',
-      },
-    });
-    logger.logInsertion({
-      common: {
-        insertionId: 'insertionId1',
-      },
-    });
-    logger.logImpression({
-      common: {
-        impressionId: 'impressionId1',
-      },
-    });
-    logger.logClick({
-      impressionId: 'impressionId1',
-      targetUrl: 'localhost/target',
-      elementId: 'button-id',
-    });
-  });
 });
 
 describe('logUser', () => {
@@ -85,11 +26,11 @@ describe('logUser', () => {
       localStorage,
     });
 
-    const user = {
-      common: {
+    const user: User = {
+      userInfo: {
         logUserId: 'log-user-id',
       },
-    } as User;
+    };
     const cf = {
       getDomainUserInfo: () => {
         return [, , , , , , 'session-id1'];
@@ -103,7 +44,7 @@ describe('logUser', () => {
         {
           schema: 'iglu:ai.promoted.test/user/jsonschema/1-0-0',
           data: {
-            common: {
+            userInfo: {
               logUserId: 'log-user-id',
             },
           },
@@ -111,7 +52,7 @@ describe('logUser', () => {
       ],
     ]);
     expect(localStorage.items).toEqual({
-      'p-uh': '79fde9e6f22beefc8863cae0df052eb4dd56babf',
+      'p-uh': '2e9b31c7dfb430e21c52ac37d549e0eebc8b683b',
       'p-us': 'session-id1',
     });
   });
@@ -130,11 +71,11 @@ describe('logUser', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const user = {
-      common: {
+    const user: User = {
+      userInfo: {
         logUserId: 'log-user-id',
       },
-    } as User;
+    };
     const cf = {
       getDomainUserInfo: () => {
         return [, , , , , , 'session-id1'];
@@ -156,12 +97,10 @@ describe('logCohortMembership', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const cohortMembership = {
-      common: {
-        cohort_id: 'UNKNOWN_COHORT',
-        experimentGroup: 'EXPERIMENT',
-      },
-    } as CohortMembership;
+    const cohortMembership: CohortMembership = {
+      cohortId: 'experiment1',
+      arm: 'TREATMENT',
+    };
     logger.logCohortMembership(cohortMembership);
 
     expect(snowplow.mock.calls).toEqual([
@@ -170,10 +109,8 @@ describe('logCohortMembership', () => {
         {
           schema: 'iglu:ai.promoted.test/cohortmembership/jsonschema/1-0-0',
           data: {
-            common: {
-              cohort_id: 'UNKNOWN_COHORT',
-              experimentGroup: 'EXPERIMENT',
-            },
+            cohortId: 'experiment1',
+            arm: 'TREATMENT',
           },
         },
       ],
@@ -193,12 +130,10 @@ describe('logCohortMembership', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const cohortMembership = {
-      common: {
-        cohort_id: 'UNKNOWN_COHORT',
-        experimentGroup: 'EXPERIMENT',
-      },
-    } as CohortMembership;
+    const cohortMembership: CohortMembership = {
+      cohortId: 'experiment1',
+      arm: 'TREATMENT',
+    };
     expect(() => logger.logCohortMembership(cohortMembership)).toThrow(/^Inner fail: Failed$/);
   });
 });
@@ -215,11 +150,9 @@ describe('logView', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const view = {
-      common: {
-        useCase: 'SEARCH',
-      },
-    } as View;
+    const view: View = {
+      useCase: 'SEARCH',
+    };
     logger.logView(view);
 
     expect(snowplow.mock.calls).toEqual([
@@ -229,9 +162,7 @@ describe('logView', () => {
         [
           {
             data: {
-              common: {
-                useCase: 'SEARCH',
-              },
+              useCase: 'SEARCH',
             },
             schema: 'iglu:ai.promoted/pageview_cx/jsonschema/2-0-0',
           },
@@ -253,142 +184,10 @@ describe('logView', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const view = {
-      common: {
-        useCase: 'SEARCH',
-      },
-    } as View;
+    const view: View = {
+      useCase: 'SEARCH',
+    };
     expect(() => logger.logView(view)).toThrow(/^Inner fail: Failed$/);
-  });
-});
-
-describe('logRequest', () => {
-  it('success', () => {
-    const snowplow = jest.fn();
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const request = {
-      common: {
-        requestId: 'abc-xyz',
-        useCase: 'SEARCH',
-      },
-      experimentOneGroup: 1,
-    } as Request;
-    logger.logRequest(request);
-
-    expect(snowplow.mock.calls).toEqual([
-      [
-        'trackUnstructEvent',
-        {
-          schema: 'iglu:ai.promoted.test/request/jsonschema/1-0-0',
-          data: {
-            common: {
-              requestId: 'abc-xyz',
-              useCase: 'SEARCH',
-            },
-            experimentOneGroup: 1,
-          },
-        },
-      ],
-    ]);
-  });
-
-  it('error', () => {
-    const snowplow = jest.fn(() => {
-      throw 'Failed';
-    });
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw 'Inner fail: ' + err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const request = {
-      common: {
-        requestId: 'abc-xyz',
-        useCase: 'SEARCH',
-      },
-      experimentOneGroup: 1,
-    } as Request;
-    expect(() => logger.logRequest(request)).toThrow(/^Inner fail: Failed$/);
-  });
-});
-
-describe('logInsertion', () => {
-  it('success', () => {
-    const snowplow = jest.fn();
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const insertion = {
-      common: {
-        insertionId: 'abc-xyz',
-        contentId: '123',
-      },
-      shirt: {
-        color: 'blue',
-      },
-    } as Insertion;
-    logger.logInsertion(insertion);
-
-    expect(snowplow.mock.calls).toEqual([
-      [
-        'trackUnstructEvent',
-        {
-          schema: 'iglu:ai.promoted.test/insertion/jsonschema/1-0-0',
-          data: {
-            common: {
-              contentId: '123',
-              insertionId: 'abc-xyz',
-            },
-            shirt: {
-              color: 'blue',
-            },
-          },
-        },
-      ],
-    ]);
-  });
-
-  it('error', () => {
-    const snowplow = jest.fn(() => {
-      throw 'Failed';
-    });
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw 'Inner fail: ' + err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const insertion = {
-      common: {
-        insertionId: 'abc-xyz',
-        contentId: '123',
-      },
-      shirt: {
-        color: 'blue',
-      },
-    } as Insertion;
-    expect(() => logger.logInsertion(insertion)).toThrow(/^Inner fail: Failed$/);
   });
 });
 
@@ -404,12 +203,9 @@ describe('logImpression', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const impression = {
-      common: {
-        impressionId: 'abc-xyz',
-      },
-      timeMillis: 123456789,
-    } as Impression;
+    const impression: Impression = {
+      impressionId: 'abc-xyz',
+    };
     logger.logImpression(impression);
 
     expect(snowplow.mock.calls).toEqual([
@@ -418,68 +214,6 @@ describe('logImpression', () => {
         {
           schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
           data: {
-            common: {
-              impressionId: 'abc-xyz',
-            },
-            timeMillis: 123456789,
-          },
-        },
-      ],
-    ]);
-  });
-
-  it('error', () => {
-    const snowplow = jest.fn(() => {
-      throw 'Failed';
-    });
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw 'Inner fail: ' + err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const impression = {
-      common: {
-        impressionId: 'abc-xyz',
-      },
-      timeMillis: 123456789,
-    } as Impression;
-    expect(() => logger.logImpression(impression)).toThrow(/^Inner fail: Failed$/);
-  });
-});
-
-describe('logAction', () => {
-  it('success', () => {
-    const snowplow = jest.fn();
-    const logger = createEventLogger({
-      platformName,
-      handleError: (err: Error) => {
-        throw err;
-      },
-      snowplow,
-      localStorage: mockLocalStorage(),
-    });
-
-    const action = {
-      timing: {
-        timeMillis: 123456789,
-      },
-      impressionId: 'abc-xyz',
-    } as Action;
-    logger.logAction(action);
-
-    expect(snowplow.mock.calls).toEqual([
-      [
-        'trackUnstructEvent',
-        {
-          schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
-          data: {
-            timing: {
-              timeMillis: 123456789,
-            },
             impressionId: 'abc-xyz',
           },
         },
@@ -500,12 +234,59 @@ describe('logAction', () => {
       localStorage: mockLocalStorage(),
     });
 
-    const action = {
-      timing: {
-        timeMillis: 123456789,
-      },
+    const impression: Impression = {
       impressionId: 'abc-xyz',
-    } as Action;
+    };
+    expect(() => logger.logImpression(impression)).toThrow(/^Inner fail: Failed$/);
+  });
+});
+
+describe('logAction', () => {
+  it('success', () => {
+    const snowplow = jest.fn();
+    const logger = createEventLogger({
+      platformName,
+      handleError: (err: Error) => {
+        throw err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+
+    const action: Action = {
+      impressionId: 'abc-xyz',
+    };
+    logger.logAction(action);
+
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+          data: {
+            impressionId: 'abc-xyz',
+          },
+        },
+      ],
+    ]);
+  });
+
+  it('error', () => {
+    const snowplow = jest.fn(() => {
+      throw 'Failed';
+    });
+    const logger = createEventLogger({
+      platformName,
+      handleError: (err: Error) => {
+        throw 'Inner fail: ' + err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+
+    const action: Action = {
+      impressionId: 'abc-xyz',
+    };
     expect(() => logger.logAction(action)).toThrow(/^Inner fail: Failed$/);
   });
 });

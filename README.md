@@ -1,6 +1,6 @@
 # promoted-snowplow-logger
 
-This event logger (tracker) library is used to simplify browser-side logging.  It relies on the browser-side JS having the Snowplow tracker library installed.  This library uses the Promoted Metrics Snowplow-compatible API.  See the unit tests for how to use.
+This event logger (tracker) library is used to simplify browser-side logging.  It relies on the browser-side JS having the Snowplow tracker library installed.  This library uses the Promoted Metrics Snowplow-compatible API.  See the [web integration guide](https://docs.promoted.ai/docs/how-to-your-web-events-with-promoted-metrics) to learn how to use this library.
 
 ## Features
 

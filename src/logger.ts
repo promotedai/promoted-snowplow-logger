@@ -47,7 +47,7 @@ export const getViewContexts = (view: View) => {
   }
 };
 
-export const createEventLogger = (args: EventLoggerArguments) => {
+export const createEventLogger = (args: EventLoggerArguments): EventLogger => {
   if (args.enabled === undefined || args.enabled) {
     return new EventLoggerImpl(args);
   } else {

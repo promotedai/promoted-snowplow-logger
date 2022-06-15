@@ -1,3 +1,25 @@
+# [4.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v3.1.0...v4.0.0) (2022-06-15)
+
+
+### Code Refactoring
+
+* improve types, remove unused types; split ([#12](https://github.com/promotedai/promoted-snowplow-logger/issues/12)) ([0c41968](https://github.com/promotedai/promoted-snowplow-logger/commit/0c41968c8007536d42ef6247bebecbd608f380e0))
+
+
+### BREAKING CHANGES
+
+* Adds better types for inputs.  Removed unused Request and Insertion types.  If we want to add something like this back, we should add a DeliveryLog.
+
+This PR also refactors index.ts into separate files.
+
+TESTING=unit tests
+
+* fix: make action.userinfo optional
+
+* fix: the types in the test data
+
+* add type to createEventLogger
+
 # [3.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v3.0.0...v3.1.0) (2021-07-22)
 
 

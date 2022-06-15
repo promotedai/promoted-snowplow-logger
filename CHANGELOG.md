@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.1.0...v4.2.0) (2022-06-15)
+
+
+### Features
+
+* loosen peer deps ([#16](https://github.com/promotedai/promoted-snowplow-logger/issues/16)) ([8a53399](https://github.com/promotedai/promoted-snowplow-logger/commit/8a53399914fc6770d6993583258f9be661c348c4))
+
 # [4.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.0.0...v4.1.0) (2022-06-15)
 
 

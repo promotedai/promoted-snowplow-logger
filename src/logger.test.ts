@@ -1,4 +1,5 @@
 import type { Action, Click, CohortMembership, Impression, User, View } from './types/event';
+import type { EventLoggerArguments } from './types/logger';
 import { createEventLogger, EventLoggerImpl } from './logger';
 
 const platformName = 'test';
@@ -312,20 +313,18 @@ describe('logClick', () => {
 
     expect(snowplow.mock.calls).toEqual([
       [
-        'trackLinkClick',
-        'target-url',
-        'element-id',
-        [],
-        '',
-        '',
-        [
-          {
-            schema: 'iglu:ai.promoted/impression_cx/jsonschema/1-0-0',
-            data: {
-              impressionId: 'abc-xyz',
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+          data: {
+            actionType: 2,
+            elementId: 'element-id',
+            impressionId: 'abc-xyz',
+            navigateAction: {
+              targetUrl: 'target-url',
             },
           },
-        ],
+        },
       ],
     ]);
   });
@@ -350,6 +349,73 @@ describe('logClick', () => {
     };
     expect(() => logger.logClick(click)).toThrow(/^Inner fail: Failed$/);
   });
+});
+
+describe('mergeBaseUserInfo', () => {
+  // TODO - specify getUserInfo but returns undefined.
+  // TODO - on record.
+
+  it('no userInfo', () => {
+    runTestCase({}, {}, {});
+  });
+
+  it('base userInfo is undefined', () => {
+    runTestCase({ getUserInfo: () => undefined }, {}, {});
+  });
+
+  it('base userInfo is specified ', () => {
+    runTestCase({ getUserInfo: () => ({ logUserId: 'abc' }) }, {}, { userInfo: { logUserId: 'abc' } });
+  });
+
+  describe('both base and record userinfo set', () => {
+    it('override logUserId', () => {
+      runTestCase(
+        { getUserInfo: () => ({ logUserId: 'abc' }) },
+        { userInfo: { logUserId: 'efg' } },
+        { userInfo: { logUserId: 'efg' } }
+      );
+    });
+
+    it('merge some fields', () => {
+      runTestCase(
+        { getUserInfo: () => ({ logUserId: 'abc' }) },
+        { userInfo: { userId: 'efg' } },
+        { userInfo: { logUserId: 'abc', userId: 'efg' } }
+      );
+    });
+  });
+
+  const runTestCase = (args: Partial<EventLoggerArguments>, inputData: Impression, expectedData: Impression) => {
+    const snowplow = jest.fn();
+    const logger = createEventLogger({
+      ...args,
+      platformName,
+      handleError: (err: Error) => {
+        throw err;
+      },
+      snowplow,
+      localStorage: mockLocalStorage(),
+    });
+
+    const impression: Impression = {
+      impressionId: 'abc-xyz',
+      ...inputData,
+    };
+    logger.logImpression(impression);
+
+    expect(snowplow.mock.calls).toEqual([
+      [
+        'trackUnstructEvent',
+        {
+          schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+          data: {
+            impressionId: 'abc-xyz',
+            ...expectedData,
+          },
+        },
+      ],
+    ]);
+  };
 });
 
 describe('flushEarlyEvents', () => {

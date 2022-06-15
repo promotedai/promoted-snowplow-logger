@@ -1,4 +1,4 @@
-import type { Action, Click, CohortMembership, Impression, User, View } from './event';
+import type { Action, Click, CohortMembership, Impression, User, UserInfo, View } from './event';
 
 /**
  * Interface for EventLogger.  The logger better handles errors and
@@ -59,23 +59,46 @@ export interface EventLoggerArguments {
    */
   enabled?: boolean;
 
-  /*
-  Indicates how to handle errors.
-  E.g. in development, throw an error so the developer can see.  In production,
-  you might want to silently log and monitor to minimize the impact to the UI
-  if there is an issue.
-
-  Here is example code for NextJS:
-  ```
-  const throwError =
-    process?.env?.NODE_ENV !== 'production' ||
-    (typeof location !== "undefined" && location?.hostname === "localhost");
-  ...
-  handleError: throwError ? (err) => { throw error; } : console.error;
-  }
-  ```
-  */
+  /**
+   * Indicates how to handle errors.
+   * E.g. in development, throw an error so the developer can see.  In production,
+   * you might want to silently log and monitor to minimize the impact to the UI
+   * if there is an issue.
+   *
+   * Here is example code for NextJS:
+   * ```
+   * const throwError =
+   *   process?.env?.NODE_ENV !== 'production' ||
+   *   (typeof location !== "undefined" && location?.hostname === "localhost");
+   *
+   * ...
+   * handleError: throwError ? (err) => { throw error; } : console.error
+   * ...
+   * ```
+   */
   handleError: (err: Error) => void;
+
+  /**
+   * Provides a base UserInfo across all records.
+   * This is useful if you have your own logUserId implementation.
+   *
+   * Example:
+   * ```
+   * const eventLogger = newEventLogger({
+   *   ...
+   *   getUserInfo: () => ({
+   *     logUserId: getCustomAnonymousUserId(),
+   *     userId: getUserId()
+   *   })
+   * }
+   * ```
+   *
+   * If both this base UserInfo and the record UserInfo is set, the UserInfos are
+   * merged and the record's UserInfos are preferred.
+   *
+   * This does not work with auto-link tracking.
+   */
+  getUserInfo?: () => UserInfo | undefined;
 
   /**
    * Used to override `window.snowplow` for testing.

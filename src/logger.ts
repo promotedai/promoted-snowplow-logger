@@ -7,7 +7,7 @@ import {
   windowSnowplowProvider,
 } from './async-snowplow';
 import { NoopEventLogger } from './noop-logger';
-import type { Action, Click, CohortMembership, Impression, User, View } from './types/event';
+import type { Action, Click, CohortMembership, HasUserInfo, Impression, User, UserInfo, View } from './types/event';
 import type { EventLogger, EventLoggerArguments, LocalStorage } from './types/logger';
 
 // Store the last domain userId we saved to Promoted to reduce the number of
@@ -15,24 +15,6 @@ import type { EventLogger, EventLoggerArguments, LocalStorage } from './types/lo
 const DEFAULT_USER_SESSION_LOCAL_STORAGE_KEY = 'p-us';
 const DEFAULT_USER_HASH_LOCAL_STORAGE_KEY = 'p-uh';
 const DEBUG_LOCAL_STORAGE_KEY = 'p-debug';
-
-/**
- * Returns the contexts for clicks given the parameters.
- */
-const getImpressionContexts = (impressionId: string | undefined) => {
-  if (impressionId) {
-    return [
-      {
-        schema: 'iglu:ai.promoted/impression_cx/jsonschema/1-0-0',
-        data: {
-          impressionId,
-        },
-      },
-    ];
-  } else {
-    return undefined;
-  }
-};
 
 export const getViewContexts = (view: View) => {
   if (view) {
@@ -79,6 +61,7 @@ export class EventLoggerImpl implements EventLogger {
   private actionIgluSchema?: string;
 
   private handleError: (err: Error) => void;
+  private getUserInfo?: () => UserInfo | undefined;
   private snowplow: AsyncSnowplow;
   private localStorage?: LocalStorage;
   private userSessionLocalStorageKey: string;
@@ -90,6 +73,7 @@ export class EventLoggerImpl implements EventLogger {
   public constructor(args: EventLoggerArguments) {
     this.platformName = args.platformName;
     this.handleError = args.handleError;
+    this.getUserInfo = args.getUserInfo;
     this.snowplow = createAsyncSnowplow(args.snowplow, args.handleError);
     this.localStorage = args.localStorage;
     if (this.localStorage === undefined && typeof window !== 'undefined') {
@@ -176,7 +160,7 @@ export class EventLoggerImpl implements EventLogger {
       if (sessionId !== oldSessionId || newUserHash !== oldUserHash) {
         this.snowplow.callSnowplow('trackUnstructEvent', {
           schema,
-          data: user,
+          data: this.mergeBaseUserInfo(user),
         });
         this.localStorage?.setItem(this.userSessionLocalStorageKey, sessionId);
         this.localStorage?.setItem(this.userHashLocalStorageKey, newUserHash);
@@ -189,30 +173,54 @@ export class EventLoggerImpl implements EventLogger {
   logCohortMembership = (cohortMembership: CohortMembership) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getCohortMembershipIgluSchema(),
-      data: cohortMembership,
+      data: this.mergeBaseUserInfo(cohortMembership),
     });
   };
 
   logView = (view: View) => {
-    this.snowplow.callSnowplow('trackPageView', null, getViewContexts(view));
+    this.snowplow.callSnowplow('trackPageView', null, getViewContexts(this.mergeBaseUserInfo(view)));
   };
 
   logImpression = (impression: Impression) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getImpressionIgluSchema(),
-      data: impression,
+      data: this.mergeBaseUserInfo(impression),
     });
   };
 
   logAction = (action: Action) => {
     this.snowplow.callSnowplow('trackUnstructEvent', {
       schema: this.getActionIgluSchema(),
-      data: action,
+      data: this.mergeBaseUserInfo(action),
     });
   };
 
-  logClick = ({ impressionId, targetUrl, elementId }: Click) => {
-    this.snowplow.callSnowplow('trackLinkClick', targetUrl, elementId, [], '', '', getImpressionContexts(impressionId));
+  logClick = (click: Click) => {
+    const action: Action = {
+      actionType: 2,
+      ...click,
+    };
+    // Moves the `targetUrl` field to `navigateAction.targetUrl`
+    const { targetUrl } = click;
+    delete action['targetUrl'];
+    if (targetUrl) {
+      action.navigateAction = { targetUrl };
+    }
+
+    this.logAction(action);
+  };
+
+  mergeBaseUserInfo = <T extends HasUserInfo>(record: T): T => {
+    // TODO - is this the right syntax?
+    const baseUserInfo = this.getUserInfo?.();
+    if (baseUserInfo) {
+      const { userInfo } = record;
+      record.userInfo = {
+        ...baseUserInfo,
+        ...userInfo,
+      };
+    }
+    return record;
   };
 
   flushEarlyEvents = () => {

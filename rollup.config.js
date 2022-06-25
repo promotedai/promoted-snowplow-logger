@@ -5,9 +5,6 @@ import del from 'rollup-plugin-delete';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 import pkg from './package.json';
 
-const dependencies = pkg.dependencies;
-const peerDependencies = pkg.config.lib.peerDependencies;
-
 export default [
   {
     input: 'src/index.ts',
@@ -31,9 +28,9 @@ export default [
           module: `${pkg.name}.esm.js`,
           typings: `index.d.ts`,
           scripts: undefined,
-          dependencies: dependencies,
+          dependencies: {},
           devDependencies: {},
-          peerDependencies,
+          peerDependencies: {},
           config: undefined,
         }),
       }),

@@ -7,13 +7,11 @@ const platformName = 'test';
 interface MockSnowplow {
   trackSelfDescribingEvent: jest.Mock;
   trackPageView: jest.Mock;
-  getDomainUserInfo: () => any;
 }
 
 const createMockSnowplow = (): MockSnowplow => ({
   trackSelfDescribingEvent: jest.fn(),
   trackPageView: jest.fn(),
-  getDomainUserInfo: () => [, , , , , , 'session-id1'],
 });
 
 const createThrowingMockSnowplow = (): MockSnowplow => ({
@@ -23,7 +21,6 @@ const createThrowingMockSnowplow = (): MockSnowplow => ({
   trackPageView: jest.fn(() => {
     throw 'Failed';
   }),
-  getDomainUserInfo: () => [, , , , , , 'session-id1'],
 });
 
 describe('logCohortMembership', () => {

@@ -16,9 +16,8 @@ export type {
   NavigateAction,
   Properties,
   View,
-  User,
   UseCaseMap,
   UseCaseString,
   UserInfo,
 } from './types/event';
-export type { EventLogger, EventLoggerArguments, LocalStorage } from './types/logger';
+export type { EventLogger, EventLoggerArguments } from './types/logger';

@@ -4,17 +4,14 @@ import typescript from 'rollup-plugin-typescript2';
 import del from 'rollup-plugin-delete';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 import pkg from './package.json';
-import { resolve } from 'path';
 
-const dependencies = pkg.config.lib.dependencies;
+const dependencies = pkg.dependencies;
 const peerDependencies = pkg.config.lib.peerDependencies;
-
-const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
 export default [
   {
     input: 'src/index.ts',
-    external: ['react'],
+    external: ['@snowplow/browser-tracker'],
     plugins: [
       del({ targets: 'dist/*' }),
       typescript({
@@ -48,7 +45,7 @@ export default [
         file: `dist/${pkg.name}.umd.js`,
         format: 'umd',
         globals: {
-          react: 'react',
+          '@snowplow/browser-tracker': '@snowplow/browser-tracker'
         },
         sourcemap: true,
       },

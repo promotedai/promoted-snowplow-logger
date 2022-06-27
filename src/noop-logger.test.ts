@@ -1,31 +1,22 @@
 import { createEventLogger } from './logger';
+import type { Snowplow } from './types/logger';
 
 const platformName = 'test';
 
-const mockLocalStorage = (items = {}) => ({
-  items,
-  getItem: (key: string) => items[key],
-  setItem: (key: string, value: string) => (items[key] = value),
+const createMockSnowplow = (): Snowplow => ({
+  trackSelfDescribingEvent: jest.fn(),
+  trackPageView: jest.fn(),
 });
 
 describe('disabled logging', () => {
   it('disable', () => {
-    const snowplow = jest.fn();
-    const localStorage = mockLocalStorage({
-      'p-us': undefined,
-      'p-uh': undefined,
-    });
+    const snowplow = createMockSnowplow();
     const logger = createEventLogger({
       enabled: false,
       platformName,
-      handleError: (err: Error) => {
-        throw err;
-      },
       snowplow,
-      localStorage,
     });
 
-    logger.logUser({});
     logger.logCohortMembership({});
     logger.logView({});
     logger.logImpression({

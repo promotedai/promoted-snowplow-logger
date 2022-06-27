@@ -3,10 +3,6 @@
 // https://github.com/promotedai/schema/blob/main/proto/event/event.proto
 // https://github.com/promotedai/schema/blob/main/proto/common/common.proto
 
-export interface User extends HasUserInfo {
-  properties?: Properties;
-}
-
 // TODO - auto-gen type from proto.
 export interface CohortMembership extends HasUserInfo {
   membershipId?: string;

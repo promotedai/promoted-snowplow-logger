@@ -6,9 +6,8 @@ This event logger (tracker) library is used to simplify browser-side logging.  I
 
 Uses
 - [TypeScript](https://www.typescriptlang.org/) support
-- [React](https://reactjs.org/) support
-- [ESLint](https://eslint.org/) (with [React](https://reactjs.org/) and [Prettier](https://prettier.io/))
-- Unit tests ([Jest](https://jestjs.io/) and [Testing Library](https://testing-library.com/))
+- [ESLint](https://eslint.org/) (with [Prettier](https://prettier.io/))
+- Unit tests ([Jest](https://jestjs.io/)
 - Minified output with [Terser](https://terser.org/)
 - Bundle size validation with [size-limit](https://github.com/ai/size-limit)
 - Flexible builds with [Rollup](https://www.rollupjs.org/)

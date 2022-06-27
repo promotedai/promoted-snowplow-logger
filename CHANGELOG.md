@@ -1,3 +1,27 @@
+# [5.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.2.0...v5.0.0) (2022-06-27)
+
+
+### Features
+
+* use Snowplow Tracker v3 ([#17](https://github.com/promotedai/promoted-snowplow-logger/issues/17)) ([a97764a](https://github.com/promotedai/promoted-snowplow-logger/commit/a97764abdb1a541e27e7cdac7124499f702c0089))
+
+
+### BREAKING CHANGES
+
+* Large changes to the interface.  Requires Snowplow Tracker v3.
+
+Also includes some smaller clean-ups:
+- Removes React.
+- Removes logUser and fields that needed.
+
+TESTING=Unit tests. Manual test.
+
+* remove the explicit snowplow dep
+
+It's not needed since we ask for the methods to be passed in.
+
+* small tsconfig update
+
 # [4.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.1.0...v4.2.0) (2022-06-15)
 
 

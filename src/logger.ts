@@ -40,6 +40,7 @@ export class EventLoggerImpl implements EventLogger {
   private impressionIgluSchema?: string;
   private actionIgluSchema?: string;
 
+  private handleError: (err: Error) => void;
   private getUserInfo?: () => UserInfo | undefined;
   private snowplow: Snowplow;
 
@@ -48,12 +49,16 @@ export class EventLoggerImpl implements EventLogger {
    */
   public constructor(args: EventLoggerArguments) {
     this.platformName = args.platformName;
+    this.handleError = args.handleError;
     this.getUserInfo = args.getUserInfo;
     this.snowplow = args.snowplow;
     this.validateArgs();
   }
 
   private validateArgs = () => {
+    if (!this.handleError) {
+      throw requiredError('handleError');
+    }
     if (!this.snowplow) {
       throw requiredError('snowplow');
     }
@@ -120,12 +125,39 @@ export class EventLoggerImpl implements EventLogger {
   };
 
   logAction = (action: Action) => {
+    this.prepareAction(action);
     this.snowplow.trackSelfDescribingEvent({
       event: {
         schema: this.getActionIgluSchema(),
         data: this.mergeBaseUserInfo(action) as any,
       },
     });
+  };
+
+  /* Validates and transforms Actions. */
+  private prepareAction = (action: Action) => {
+    const { cart } = action;
+    if (cart) {
+      for (const cartContent of cart.contents) {
+        if (cartContent.quantity == 0) {
+          // If handleError does not throw, continue processing.
+          this.handleError(new Error('CartContent.quantity should be non-zero'));
+        }
+        const { pricePerUnit } = cartContent;
+        if (pricePerUnit && pricePerUnit.amount !== undefined) {
+          if (pricePerUnit.amountMicros !== undefined) {
+            this.handleError(new Error('Do not set both amount and amountMicros'));
+          }
+          // Our API currently only supports amountMicros.
+          // This long multiplication is fine to run in the browser for most platforms.
+          // TODO - eventually move this behind the API.
+          cartContent.pricePerUnit = {
+            currencyCode: pricePerUnit.currencyCode,
+            amountMicros: 1000000 * pricePerUnit.amount,
+          };
+        }
+      }
+    }
   };
 
   logClick = (click: Click) => {

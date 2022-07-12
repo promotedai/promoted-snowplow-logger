@@ -103,6 +103,8 @@ export interface Action extends HasUserInfo {
   actionType?: ActionTypeMap[keyof ActionTypeMap] | ActionTypeString;
   elementId?: string;
   navigateAction?: NavigateAction;
+  // `cart` can be set on `CHECKOUT` and `PURCHASE`.  It is better to log these conversion actions from your server (for improved security).
+  cart?: Cart;
   properties?: Properties;
 }
 
@@ -178,6 +180,78 @@ export type ActionTypeString =
   | 'ANSWER_QUESTION'
   | 'COMPLETE_SIGN_IN'
   | 'COMPLETE_SIGN_UP';
+
+export interface Cart {
+  contents: CartContent[];
+}
+
+export interface CartContent {
+  contentId: string;
+
+  // Required.  Quantity, units, etc.  If there's only 1 item, set to 1.
+  quantity: number;
+
+  // Price of a single unit of content.  `A unit` defaults to `quantity=1`.
+  pricePerUnit: Money;
+}
+
+export interface Money {
+  currencyCode?: CurrencyCodeMap[keyof CurrencyCodeMap] | CurrencyCodeString;
+
+  // Easier amount value to set.  1 USD = 1 amount.
+  amount?: number;
+
+  // Our APIs store the amount in micros internally to avoid double aggregation errors.
+  // 1 million = 1 denomination in the currency.  E.g. 1 USD = 1,000,000 price_micros_per_unit.
+  amountMicros?: number;
+}
+
+export interface CurrencyCodeMap {
+  UNKNOWN_CURRENCY_CODE: 0;
+  USD: 1;
+  EUR: 2;
+  JPY: 3;
+  GBP: 4;
+  AUD: 5;
+  CAD: 6;
+  CHF: 7;
+  CNY: 8;
+  HKD: 9;
+  NZD: 10;
+  SEK: 11;
+  KRW: 12;
+  SGD: 13;
+  NOK: 14;
+  MXN: 15;
+  INR: 16;
+  RUB: 17;
+  ZAR: 18;
+  TRY: 19;
+  BRL: 20;
+}
+
+export type CurrencyCodeString =
+  | 'UNKNOWN_CURRENCY_CODE'
+  | 'USD'
+  | 'EUR'
+  | 'JPY'
+  | 'GBP'
+  | 'AUD'
+  | 'CAD'
+  | 'CHF'
+  | 'CNY'
+  | 'HKD'
+  | 'NZD'
+  | 'SEK'
+  | 'KRW'
+  | 'SGD'
+  | 'NOK'
+  | 'MXN'
+  | 'INR'
+  | 'RUB'
+  | 'ZAR'
+  | 'TRY'
+  | 'BRL';
 
 // This is not a proto.  This is an interface just for this library.
 export interface Click extends Action {

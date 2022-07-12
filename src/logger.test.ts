@@ -1,5 +1,5 @@
 import type { Action, Click, CohortMembership, Impression, View } from './types/event';
-import type { EventLoggerArguments } from './types/logger';
+import type { EventLogger, EventLoggerArguments } from './types/logger';
 import { createEventLogger } from './logger';
 
 const platformName = 'test';
@@ -23,10 +23,18 @@ const createThrowingMockSnowplow = (): MockSnowplow => ({
   }),
 });
 
+export const createTestEventLogger = (args: Omit<EventLoggerArguments, 'handleError'>): EventLogger =>
+  createEventLogger({
+    ...args,
+    handleError: (e) => {
+      throw e;
+    },
+  });
+
 describe('logCohortMembership', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -54,7 +62,7 @@ describe('logCohortMembership', () => {
 
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -70,7 +78,7 @@ describe('logCohortMembership', () => {
 describe('logView', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -98,7 +106,7 @@ describe('logView', () => {
 
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -113,7 +121,7 @@ describe('logView', () => {
 describe('logImpression', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -139,7 +147,7 @@ describe('logImpression', () => {
 
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -154,7 +162,7 @@ describe('logImpression', () => {
 describe('logAction', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -180,7 +188,7 @@ describe('logAction', () => {
 
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -190,12 +198,119 @@ describe('logAction', () => {
     };
     expect(() => logger.logAction(action)).toThrow(/^Failed$/);
   });
+
+  describe('cart', () => {
+    it('success - convert amount to micros', () => {
+      const snowplow = createMockSnowplow();
+      const logger = createTestEventLogger({
+        platformName,
+        snowplow,
+      });
+
+      const action: Action = {
+        impressionId: 'abc-xyz',
+        actionType: 'CHECKOUT',
+        cart: {
+          contents: [
+            {
+              contentId: '1',
+              quantity: 1,
+              pricePerUnit: {
+                currencyCode: 'USD',
+                amount: 2,
+              },
+            },
+          ],
+        },
+      };
+      logger.logAction(action);
+
+      expect(snowplow.trackSelfDescribingEvent.mock.calls).toEqual([
+        [
+          {
+            event: {
+              schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+              data: {
+                impressionId: 'abc-xyz',
+                actionType: 'CHECKOUT',
+                cart: {
+                  contents: [
+                    {
+                      contentId: '1',
+                      quantity: 1,
+                      pricePerUnit: {
+                        currencyCode: 'USD',
+                        amountMicros: 2000000,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        ],
+      ]);
+    });
+
+    it('error - quantity should be non-zero', () => {
+      const snowplow = createMockSnowplow();
+      const logger = createTestEventLogger({
+        platformName,
+        snowplow,
+      });
+
+      const action: Action = {
+        impressionId: 'abc-xyz',
+        actionType: 'CHECKOUT',
+        cart: {
+          contents: [
+            {
+              contentId: '1',
+              quantity: 0,
+              pricePerUnit: {
+                currencyCode: 'USD',
+                amount: 2,
+              },
+            },
+          ],
+        },
+      };
+      expect(() => logger.logAction(action)).toThrow(/^CartContent.quantity should be non-zero$/);
+    });
+
+    it('error - do not set both amount and amountMicros', () => {
+      const snowplow = createMockSnowplow();
+      const logger = createTestEventLogger({
+        platformName,
+        snowplow,
+      });
+
+      const action: Action = {
+        impressionId: 'abc-xyz',
+        actionType: 'CHECKOUT',
+        cart: {
+          contents: [
+            {
+              contentId: '1',
+              quantity: 1,
+              pricePerUnit: {
+                currencyCode: 'USD',
+                amount: 2,
+                amountMicros: 2000000,
+              },
+            },
+          ],
+        },
+      };
+      expect(() => logger.logAction(action)).toThrow(/^Do not set both amount and amountMicros$/);
+    });
+  });
 });
 
 describe('logClick', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -228,7 +343,7 @@ describe('logClick', () => {
 
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       platformName,
       snowplow,
     });
@@ -278,7 +393,7 @@ describe('mergeBaseUserInfo', () => {
 
   const runTestCase = (args: Partial<EventLoggerArguments>, inputData: Impression, expectedData: Impression) => {
     const snowplow = createMockSnowplow();
-    const logger = createEventLogger({
+    const logger = createTestEventLogger({
       ...args,
       platformName,
       snowplow,

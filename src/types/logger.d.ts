@@ -62,6 +62,25 @@ export interface EventLoggerArguments {
   enabled?: boolean;
 
   /**
+   * Indicates how to handle errors.
+   * E.g. in development, throw an error so the developer can see.  In production,
+   * you might want to silently log and monitor to minimize the impact to the UI
+   * if there is an issue.
+   *
+   * Here is example code for NextJS:
+   * ```
+   * const throwError =
+   *   process?.env?.NODE_ENV !== 'production' ||
+   *   (typeof location !== "undefined" && location?.hostname === "localhost");
+   *
+   * ...
+   * handleError: throwError ? (err) => { throw error; } : console.error
+   * ...
+   * ```
+   */
+  handleError: (err: Error) => void;
+
+  /**
    * Provides a base UserInfo across all records.
    * This is useful if you have your own logUserId implementation.
    *

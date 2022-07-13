@@ -15,6 +15,9 @@ describe('disabled logging', () => {
       enabled: false,
       platformName,
       snowplow,
+      handleError: (e) => {
+        throw e;
+      },
     });
 
     logger.logCohortMembership({});

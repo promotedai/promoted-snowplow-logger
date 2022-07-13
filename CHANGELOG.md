@@ -1,3 +1,19 @@
+# [6.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v5.0.0...v6.0.0) (2022-07-13)
+
+
+### Features
+
+* support shopping cart on actions ([#18](https://github.com/promotedai/promoted-snowplow-logger/issues/18)) ([f505bd9](https://github.com/promotedai/promoted-snowplow-logger/commit/f505bd9bc498c3dfc8196b2c0a5a91bda05fc8fc))
+
+
+### BREAKING CHANGES
+
+* adds ErrorHandler again to the constructor for use in validation code.
+
+TESTING=unit tests
+
+* fix: test
+
 # [5.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v4.2.0...v5.0.0) (2022-06-27)
 
 

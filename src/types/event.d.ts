@@ -29,6 +29,7 @@ export interface View extends HasUserInfo {
   viewId?: string;
   autoViewId?: string;
   sessionId?: string;
+  contentId?: string;
   name?: string;
   useCase?: UseCaseMap[keyof UseCaseMap] | UseCaseString;
   searchQuery?: string;

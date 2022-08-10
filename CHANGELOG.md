@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.0.0...v6.1.0) (2022-08-10)
+
+
+### Features
+
+* add View.contentId ([#19](https://github.com/promotedai/promoted-snowplow-logger/issues/19)) ([6ded946](https://github.com/promotedai/promoted-snowplow-logger/commit/6ded946945e0e93907d631413e99b87ed5dbf094))
+
 # [6.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v5.0.0...v6.0.0) (2022-07-13)
 
 

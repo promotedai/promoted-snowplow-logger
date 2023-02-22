@@ -153,7 +153,7 @@ export class EventLoggerImpl implements EventLogger {
           // TODO - eventually move this behind the API.
           cartContent.pricePerUnit = {
             currencyCode: pricePerUnit.currencyCode,
-            amountMicros: 1000000 * pricePerUnit.amount,
+            amountMicros: Math.round(1000000 * pricePerUnit.amount),
           };
         }
       }

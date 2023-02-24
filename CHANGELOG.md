@@ -1,3 +1,11 @@
+## [6.1.1](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.1.0...v6.1.1) (2023-02-24)
+
+
+### Bug Fixes
+
+* round micros ([#20](https://github.com/promotedai/promoted-snowplow-logger/issues/20)) ([05aeae6](https://github.com/promotedai/promoted-snowplow-logger/commit/05aeae6602a7052c88bbe69fcf913c83ae44ab11))
+* semantic release github action ([#21](https://github.com/promotedai/promoted-snowplow-logger/issues/21)) ([350efd2](https://github.com/promotedai/promoted-snowplow-logger/commit/350efd26521527abc9944678ccb7b2bcd99a0171))
+
 # [6.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.0.0...v6.1.0) (2022-08-10)
 
 

@@ -82,14 +82,14 @@ export interface EventLoggerArguments {
 
   /**
    * Provides a base UserInfo across all records.
-   * This is useful if you have your own logUserId implementation.
+   * This is useful if you have your own anonUserId implementation.
    *
    * Example:
    * ```
    * const eventLogger = newEventLogger({
    *   ...
    *   getUserInfo: () => ({
-   *     logUserId: getCustomAnonymousUserId(),
+   *     anonUserId: getCustomAnonymousUserId(),
    *     userId: getUserId()
    *   })
    * }

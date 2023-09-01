@@ -370,23 +370,23 @@ describe('mergeBaseUserInfo', () => {
   });
 
   it('base userInfo is specified ', () => {
-    runTestCase({ getUserInfo: () => ({ logUserId: 'abc' }) }, {}, { userInfo: { logUserId: 'abc' } });
+    runTestCase({ getUserInfo: () => ({ anonUserId: 'abc' }) }, {}, { userInfo: { anonUserId: 'abc' } });
   });
 
   describe('both base and record userinfo set', () => {
-    it('override logUserId', () => {
+    it('override anonUserId', () => {
       runTestCase(
-        { getUserInfo: () => ({ logUserId: 'abc' }) },
-        { userInfo: { logUserId: 'efg' } },
-        { userInfo: { logUserId: 'efg' } }
+        { getUserInfo: () => ({ anonUserId: 'abc' }) },
+        { userInfo: { anonUserId: 'efg' } },
+        { userInfo: { anonUserId: 'efg' } }
       );
     });
 
     it('merge some fields', () => {
       runTestCase(
-        { getUserInfo: () => ({ logUserId: 'abc' }) },
+        { getUserInfo: () => ({ anonUserId: 'abc' }) },
         { userInfo: { userId: 'efg' } },
-        { userInfo: { logUserId: 'abc', userId: 'efg' } }
+        { userInfo: { anonUserId: 'abc', userId: 'efg' } }
       );
     });
   });

@@ -1,3 +1,17 @@
+# [7.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.1.1...v7.0.0) (2023-09-08)
+
+
+### Features
+
+* switch logUserId to anonUserId ([#22](https://github.com/promotedai/promoted-snowplow-logger/issues/22)) ([c3427da](https://github.com/promotedai/promoted-snowplow-logger/commit/c3427da721879377787ebe4fd962a35e0c1ced13))
+
+
+### BREAKING CHANGES
+
+* removes the logUserId field
+
+TESTING=unit tests
+
 ## [6.1.1](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.1.0...v6.1.1) (2023-02-24)
 
 

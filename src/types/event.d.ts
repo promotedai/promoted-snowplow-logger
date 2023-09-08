@@ -265,7 +265,7 @@ export interface HasUserInfo {
 
 export interface UserInfo {
   userId?: string;
-  logUserId?: string;
+  anonUserId?: string;
   isInternalUser?: boolean;
   ignoreUsage?: boolean;
 }

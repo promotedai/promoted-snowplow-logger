@@ -26,6 +26,7 @@ export type CohortArmString = 'UNKNOWN_GROUP' | 'CONTROL' | 'TREATMENT' | 'TREAT
 
 // TODO - auto-gen type from proto.
 export interface View extends HasUserInfo {
+  // If left blank, Promoted will use the Snowplow event ID.
   viewId?: string;
   autoViewId?: string;
   sessionId?: string;
@@ -67,9 +68,12 @@ export type UseCaseString =
 
 // TODO - auto-gen type from proto.
 export interface Impression extends HasUserInfo {
+  // If left blank, Promoted will use the Snowplow event ID.
   impressionId?: string;
+  // Used for joins in Promoted.  If left blank, Promoted will use other foreign keys for joining.
   insertionId?: string;
   contentId?: string;
+  // Used for joins in Promoted.  If left blank, Promoted will use other foreign keys for joining.
   requestId?: string;
   viewId?: string;
   autoViewId?: string;
@@ -92,9 +96,13 @@ export type ImpressionSourceTypeString = 'UNKNOWN_IMPRESSION_SOURCE_TYPE' | 'DEL
 
 // TODO - auto-gen type from proto.
 export interface Action extends HasUserInfo {
+  // If left blank, Promoted will use the Snowplow event ID.
   actionId?: string;
+  // Used for joins in Promoted.  If left blank, Promoted will fallback to other foreign keys.
   impressionId?: string;
+  // Used for joins in Promoted.  If left blank, Promoted will fallback to other foreign keys.
   insertionId?: string;
+  // TODO - change this to required after all clients migrate to filling it in.
   contentId?: string;
   requestId?: string;
   viewId?: string;

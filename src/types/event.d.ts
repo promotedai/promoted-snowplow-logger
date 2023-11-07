@@ -110,6 +110,8 @@ export interface Action extends HasUserInfo {
   sessionId?: string;
   name?: string;
   actionType?: ActionTypeMap[keyof ActionTypeMap] | ActionTypeString;
+  // Used when `actionType=CUSTOM_ACTION_TYPE`.  `actionType` is a fixed enum value and `customActionType` allows for a flexible string input.
+  customActionType?: string;
   elementId?: string;
   navigateAction?: NavigateAction;
   // `cart` can be set on `CHECKOUT` and `PURCHASE`.  It is better to log these conversion actions from your server (for improved security).

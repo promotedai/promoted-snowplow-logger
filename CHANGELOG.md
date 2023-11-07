@@ -1,3 +1,10 @@
+# [7.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.0.0...v7.1.0) (2023-11-07)
+
+
+### Features
+
+* add Action.customActionType ([#24](https://github.com/promotedai/promoted-snowplow-logger/issues/24)) ([584fb54](https://github.com/promotedai/promoted-snowplow-logger/commit/584fb5458b4bac08735a5dd7caa4744352a54100))
+
 # [7.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v6.1.1...v7.0.0) (2023-09-08)
 
 

@@ -3,6 +3,7 @@ import type { EventLogger, EventLoggerArguments } from './types/logger';
 import { createEventLogger } from './logger';
 
 const platformName = 'test';
+const snowplowTrackers: Array<string> | string | undefined = undefined;
 
 interface MockSnowplow {
   trackSelfDescribingEvent: jest.Mock;
@@ -37,6 +38,7 @@ describe('logCohortMembership', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const cohortMembership: CohortMembership = {
@@ -56,6 +58,7 @@ describe('logCohortMembership', () => {
             },
           },
         },
+        snowplowTrackers,
       ],
     ]);
   });
@@ -65,6 +68,7 @@ describe('logCohortMembership', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const cohortMembership: CohortMembership = {
@@ -81,6 +85,7 @@ describe('logView', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const view: View = {
@@ -100,6 +105,7 @@ describe('logView', () => {
             },
           ],
         },
+        snowplowTrackers,
       ],
     ]);
   });
@@ -124,6 +130,7 @@ describe('logImpression', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const impression: Impression = {
@@ -141,6 +148,7 @@ describe('logImpression', () => {
             },
           },
         },
+        snowplowTrackers,
       ],
     ]);
   });
@@ -165,6 +173,7 @@ describe('logAction', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const action: Action = {
@@ -182,6 +191,7 @@ describe('logAction', () => {
             },
           },
         },
+        snowplowTrackers,
       ],
     ]);
   });
@@ -205,6 +215,7 @@ describe('logAction', () => {
       const logger = createTestEventLogger({
         platformName,
         snowplow,
+        snowplowTrackers,
       });
 
       const action: Action = {
@@ -248,6 +259,7 @@ describe('logAction', () => {
               },
             },
           },
+          snowplowTrackers,
         ],
       ]);
     });
@@ -313,6 +325,7 @@ describe('logClick', () => {
     const logger = createTestEventLogger({
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const click: Click = {
@@ -337,6 +350,7 @@ describe('logClick', () => {
             },
           },
         },
+        snowplowTrackers,
       ],
     ]);
   });
@@ -397,6 +411,7 @@ describe('mergeBaseUserInfo', () => {
       ...args,
       platformName,
       snowplow,
+      snowplowTrackers,
     });
 
     const impression: Impression = {
@@ -416,6 +431,53 @@ describe('mergeBaseUserInfo', () => {
             },
           },
         },
+        snowplowTrackers,
+      ],
+    ]);
+  };
+});
+
+describe('snowplowTrackers', () => {
+  it('will pass undefined trackers to snowplow', () => {
+    runTrackersTestCase(undefined, undefined);
+  });
+
+  it('it will convert a single value to an array and pass to snowplow', () => {
+    runTrackersTestCase('tracker1', ['tracker1']);
+  });
+
+  it('will pass an array to snowplow', () => {
+    const trackers = ['tracker1', 'tracker2'];
+    runTrackersTestCase(trackers, trackers);
+  });
+
+  const runTrackersTestCase = (
+    snowplowTrackers: Array<string> | string | undefined,
+    expectedTrackers: Array<string> | undefined
+  ) => {
+    const snowplow = createMockSnowplow();
+    const logger = createTestEventLogger({
+      platformName,
+      snowplow,
+      snowplowTrackers,
+    });
+
+    const impression: Impression = {
+      impressionId: 'abc-xyz',
+    };
+    logger.logImpression(impression);
+
+    expect(snowplow.trackSelfDescribingEvent.mock.calls).toEqual([
+      [
+        {
+          event: {
+            schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+            data: {
+              impressionId: 'abc-xyz',
+            },
+          },
+        },
+        expectedTrackers,
       ],
     ]);
   };

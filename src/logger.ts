@@ -43,6 +43,7 @@ export class EventLoggerImpl implements EventLogger {
   private handleError: (err: Error) => void;
   private getUserInfo?: () => UserInfo | undefined;
   private snowplow: Snowplow;
+  private snowplowTrackers?: Array<string> | undefined;
 
   /**
    * @params {EventLoggerArguments} args The arguments for the logger.
@@ -52,6 +53,7 @@ export class EventLoggerImpl implements EventLogger {
     this.handleError = args.handleError;
     this.getUserInfo = args.getUserInfo;
     this.snowplow = args.snowplow;
+    this.snowplowTrackers = this.arrayWrap(args.snowplowTrackers);
     this.validateArgs();
   }
 
@@ -101,37 +103,49 @@ export class EventLoggerImpl implements EventLogger {
   }
 
   logCohortMembership = (cohortMembership: CohortMembership) => {
-    this.snowplow.trackSelfDescribingEvent({
-      event: {
-        schema: this.getCohortMembershipIgluSchema(),
-        data: this.mergeBaseUserInfo(cohortMembership) as any,
+    this.snowplow.trackSelfDescribingEvent(
+      {
+        event: {
+          schema: this.getCohortMembershipIgluSchema(),
+          data: this.mergeBaseUserInfo(cohortMembership) as any,
+        },
       },
-    });
+      this.snowplowTrackers
+    );
   };
 
   logView = (view: View) => {
-    this.snowplow.trackPageView({
-      context: getViewContexts(this.mergeBaseUserInfo(view)) as Array<SelfDescribingJson>,
-    });
+    this.snowplow.trackPageView(
+      {
+        context: getViewContexts(this.mergeBaseUserInfo(view)) as Array<SelfDescribingJson>,
+      },
+      this.snowplowTrackers
+    );
   };
 
   logImpression = (impression: Impression) => {
-    this.snowplow.trackSelfDescribingEvent({
-      event: {
-        schema: this.getImpressionIgluSchema(),
-        data: this.mergeBaseUserInfo(impression) as any,
+    this.snowplow.trackSelfDescribingEvent(
+      {
+        event: {
+          schema: this.getImpressionIgluSchema(),
+          data: this.mergeBaseUserInfo(impression) as any,
+        },
       },
-    });
+      this.snowplowTrackers
+    );
   };
 
   logAction = (action: Action) => {
     this.prepareAction(action);
-    this.snowplow.trackSelfDescribingEvent({
-      event: {
-        schema: this.getActionIgluSchema(),
-        data: this.mergeBaseUserInfo(action) as any,
+    this.snowplow.trackSelfDescribingEvent(
+      {
+        event: {
+          schema: this.getActionIgluSchema(),
+          data: this.mergeBaseUserInfo(action) as any,
+        },
       },
-    });
+      this.snowplowTrackers
+    );
   };
 
   /* Validates and transforms Actions. */
@@ -186,5 +200,22 @@ export class EventLoggerImpl implements EventLogger {
       };
     }
     return record;
+  };
+
+  /**
+   * Wraps a value in an array if it is not already an array. If the value is undefined, it returns undefined.
+   *
+   * @param value - The value to be wrapped in an array. It can be of any type T or an array of type T.
+   * @returns If the value is an array, it returns the array as is. If the value is not an array but is defined,
+   *          it returns the value wrapped in an array. If the value is undefined, it returns undefined.
+   */
+  private arrayWrap = <T>(value?: T | T[]): T[] | undefined => {
+    if (Array.isArray(value)) {
+      return value;
+    } else if (value) {
+      return [value];
+    } else {
+      return undefined;
+    }
   };
 }

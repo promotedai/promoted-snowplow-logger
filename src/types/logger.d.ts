@@ -57,6 +57,14 @@ export interface EventLoggerArguments {
   snowplow: Snowplow;
 
   /**
+   * The name of the tracker to use.
+   * This is useful if you have multiple trackers on the page.
+   * See [Managing multiple trackers](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/web-tracker/tracker-setup/managing-multiple-trackers/) for how this parameter is used.
+   * If no tracker names are provided, all events will get sent to all instantiated trackers.
+   */
+  snowplowTrackers?: Array<string> | string;
+
+  /**
    * A way to turn off logging.  Defaults to true.
    */
   enabled?: boolean;

@@ -1,3 +1,10 @@
+# [7.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.1.0...v7.2.0) (2023-12-15)
+
+
+### Features
+
+* adds capability for multiple snowplow trackers on a page ([#25](https://github.com/promotedai/promoted-snowplow-logger/issues/25)) ([83031f9](https://github.com/promotedai/promoted-snowplow-logger/commit/83031f9991e57441380dee4ce591406a14c4afd2))
+
 # [7.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.0.0...v7.1.0) (2023-11-07)
 
 

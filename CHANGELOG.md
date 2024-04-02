@@ -1,3 +1,19 @@
+# [8.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.2.0...v8.0.0) (2024-04-02)
+
+
+### Code Refactoring
+
+* remove platformName ([#26](https://github.com/promotedai/promoted-snowplow-logger/issues/26)) ([7d7105c](https://github.com/promotedai/promoted-snowplow-logger/commit/7d7105c86ffb04b8eb3a61bf65c0ac38b5bf3141))
+
+
+### BREAKING CHANGES
+
+* this removes a previously required field.
+
+After removing the validation, the platform subdomain is not needed anymore.
+
+TESTING=ran unit tests
+
 # [7.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.1.0...v7.2.0) (2023-12-15)
 
 

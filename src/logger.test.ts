@@ -2,7 +2,6 @@ import type { Action, Click, CohortMembership, Impression, View } from './types/
 import type { EventLogger, EventLoggerArguments } from './types/logger';
 import { createEventLogger } from './logger';
 
-const platformName = 'test';
 const snowplowTrackers: Array<string> | string | undefined = undefined;
 
 interface MockSnowplow {
@@ -36,7 +35,6 @@ describe('logCohortMembership', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -51,7 +49,7 @@ describe('logCohortMembership', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/cohortmembership/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/cohortmembership/jsonschema/1-0-0',
             data: {
               cohortId: 'experiment1',
               arm: 'TREATMENT',
@@ -66,7 +64,6 @@ describe('logCohortMembership', () => {
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -83,7 +80,6 @@ describe('logView', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -113,7 +109,6 @@ describe('logView', () => {
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
     });
 
@@ -128,7 +123,6 @@ describe('logImpression', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -142,7 +136,7 @@ describe('logImpression', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/impression/jsonschema/1-0-0',
             data: {
               impressionId: 'abc-xyz',
             },
@@ -156,7 +150,6 @@ describe('logImpression', () => {
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
     });
 
@@ -171,7 +164,6 @@ describe('logAction', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -185,7 +177,7 @@ describe('logAction', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/action/jsonschema/1-0-0',
             data: {
               impressionId: 'abc-xyz',
             },
@@ -199,7 +191,6 @@ describe('logAction', () => {
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
     });
 
@@ -213,7 +204,6 @@ describe('logAction', () => {
     it('success - convert amount to micros', () => {
       const snowplow = createMockSnowplow();
       const logger = createTestEventLogger({
-        platformName,
         snowplow,
         snowplowTrackers,
       });
@@ -240,7 +230,7 @@ describe('logAction', () => {
         [
           {
             event: {
-              schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+              schema: 'iglu:ai.promoted/action/jsonschema/1-0-0',
               data: {
                 impressionId: 'abc-xyz',
                 actionType: 'CHECKOUT',
@@ -267,7 +257,6 @@ describe('logAction', () => {
     it('error - quantity should be non-zero', () => {
       const snowplow = createMockSnowplow();
       const logger = createTestEventLogger({
-        platformName,
         snowplow,
       });
 
@@ -293,7 +282,6 @@ describe('logAction', () => {
     it('error - do not set both amount and amountMicros', () => {
       const snowplow = createMockSnowplow();
       const logger = createTestEventLogger({
-        platformName,
         snowplow,
       });
 
@@ -323,7 +311,6 @@ describe('logClick', () => {
   it('success', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -339,7 +326,7 @@ describe('logClick', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/action/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/action/jsonschema/1-0-0',
             data: {
               actionType: 2,
               elementId: 'element-id',
@@ -358,7 +345,6 @@ describe('logClick', () => {
   it('error', () => {
     const snowplow = createThrowingMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
     });
 
@@ -409,7 +395,6 @@ describe('mergeBaseUserInfo', () => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
       ...args,
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -424,7 +409,7 @@ describe('mergeBaseUserInfo', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/impression/jsonschema/1-0-0',
             data: {
               impressionId: 'abc-xyz',
               ...expectedData,
@@ -457,7 +442,6 @@ describe('snowplowTrackers', () => {
   ) => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({
-      platformName,
       snowplow,
       snowplowTrackers,
     });
@@ -471,7 +455,7 @@ describe('snowplowTrackers', () => {
       [
         {
           event: {
-            schema: 'iglu:ai.promoted.test/impression/jsonschema/1-0-0',
+            schema: 'iglu:ai.promoted/impression/jsonschema/1-0-0',
             data: {
               impressionId: 'abc-xyz',
             },

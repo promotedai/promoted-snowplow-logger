@@ -46,11 +46,6 @@ interface EventLogger {
  */
 export interface EventLoggerArguments {
   /**
-   * The name of your Platform in Promoted's configuration.
-   */
-  platformName: string;
-
-  /**
    * A smaller Snowplow interface.  This is needed so we can keep Snowplow as a
    * peer dependency.
    */

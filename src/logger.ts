@@ -33,13 +33,6 @@ const requiredError = (field: string) => new Error(`${field} is required`);
  * to reduce memory pressure.
  */
 export class EventLoggerImpl implements EventLogger {
-  private platformName: string;
-
-  // Delay generation until needed since not all pages log all types of schemas.
-  private cohortMembershipIgluSchema?: string;
-  private impressionIgluSchema?: string;
-  private actionIgluSchema?: string;
-
   private handleError: (err: Error) => void;
   private getUserInfo?: () => UserInfo | undefined;
   private snowplow: Snowplow;
@@ -49,7 +42,6 @@ export class EventLoggerImpl implements EventLogger {
    * @params {EventLoggerArguments} args The arguments for the logger.
    */
   public constructor(args: EventLoggerArguments) {
-    this.platformName = args.platformName;
     this.handleError = args.handleError;
     this.getUserInfo = args.getUserInfo;
     this.snowplow = args.snowplow;
@@ -72,41 +64,11 @@ export class EventLoggerImpl implements EventLogger {
     }
   };
 
-  /**
-   * Returns the CohortMembership IGLU Schema URL.  As a function to delay string construction.
-   */
-  private getCohortMembershipIgluSchema() {
-    if (!this.cohortMembershipIgluSchema) {
-      this.cohortMembershipIgluSchema = `iglu:ai.promoted.${this.platformName}/cohortmembership/jsonschema/1-0-0`;
-    }
-    return this.cohortMembershipIgluSchema;
-  }
-
-  /**
-   * Returns the Impression IGLU Schema URL.  As a function to delay string construction.
-   */
-  private getImpressionIgluSchema() {
-    if (!this.impressionIgluSchema) {
-      this.impressionIgluSchema = `iglu:ai.promoted.${this.platformName}/impression/jsonschema/1-0-0`;
-    }
-    return this.impressionIgluSchema;
-  }
-
-  /**
-   * Returns the Action IGLU Schema URL.  As a function to delay string construction.
-   */
-  private getActionIgluSchema() {
-    if (!this.actionIgluSchema) {
-      this.actionIgluSchema = `iglu:ai.promoted.${this.platformName}/action/jsonschema/1-0-0`;
-    }
-    return this.actionIgluSchema;
-  }
-
   logCohortMembership = (cohortMembership: CohortMembership) => {
     this.snowplow.trackSelfDescribingEvent(
       {
         event: {
-          schema: this.getCohortMembershipIgluSchema(),
+          schema: 'iglu:ai.promoted/cohortmembership/jsonschema/1-0-0',
           data: this.mergeBaseUserInfo(cohortMembership) as any,
         },
       },
@@ -127,7 +89,7 @@ export class EventLoggerImpl implements EventLogger {
     this.snowplow.trackSelfDescribingEvent(
       {
         event: {
-          schema: this.getImpressionIgluSchema(),
+          schema: 'iglu:ai.promoted/impression/jsonschema/1-0-0',
           data: this.mergeBaseUserInfo(impression) as any,
         },
       },
@@ -140,7 +102,7 @@ export class EventLoggerImpl implements EventLogger {
     this.snowplow.trackSelfDescribingEvent(
       {
         event: {
-          schema: this.getActionIgluSchema(),
+          schema: 'iglu:ai.promoted/action/jsonschema/1-0-0',
           data: this.mergeBaseUserInfo(action) as any,
         },
       },

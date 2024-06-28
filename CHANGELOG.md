@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.0.0...v8.1.0) (2024-06-28)
+
+
+### Features
+
+* update nodejs dep ([#27](https://github.com/promotedai/promoted-snowplow-logger/issues/27)) ([2b22db5](https://github.com/promotedai/promoted-snowplow-logger/commit/2b22db560b9d1429cd7d6f65edeae2eaa3ae6628))
+
 # [8.0.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v7.2.0...v8.0.0) (2024-04-02)
 
 

@@ -1,3 +1,10 @@
+## [8.1.1](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.1.0...v8.1.1) (2024-06-28)
+
+
+### Bug Fixes
+
+* dependabot ([#28](https://github.com/promotedai/promoted-snowplow-logger/issues/28)) ([5fc795e](https://github.com/promotedai/promoted-snowplow-logger/commit/5fc795eb6e93af31cd208b1f8e261509bcc0f63e))
+
 # [8.1.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.0.0...v8.1.0) (2024-06-28)
 
 

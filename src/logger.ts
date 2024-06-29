@@ -72,7 +72,7 @@ export class EventLoggerImpl implements EventLogger {
           data: this.mergeBaseUserInfo(cohortMembership) as any,
         },
       },
-      this.snowplowTrackers
+      this.snowplowTrackers,
     );
   };
 
@@ -81,7 +81,7 @@ export class EventLoggerImpl implements EventLogger {
       {
         context: getViewContexts(this.mergeBaseUserInfo(view)) as Array<SelfDescribingJson>,
       },
-      this.snowplowTrackers
+      this.snowplowTrackers,
     );
   };
 
@@ -93,7 +93,7 @@ export class EventLoggerImpl implements EventLogger {
           data: this.mergeBaseUserInfo(impression) as any,
         },
       },
-      this.snowplowTrackers
+      this.snowplowTrackers,
     );
   };
 
@@ -106,7 +106,7 @@ export class EventLoggerImpl implements EventLogger {
           data: this.mergeBaseUserInfo(action) as any,
         },
       },
-      this.snowplowTrackers
+      this.snowplowTrackers,
     );
   };
 
@@ -143,7 +143,7 @@ export class EventLoggerImpl implements EventLogger {
     };
     // Moves the `targetUrl` field to `navigateAction.targetUrl`
     const { targetUrl } = click;
-    delete action['targetUrl'];
+    delete (action as any)['targetUrl'];
     if (targetUrl) {
       action.navigateAction = { targetUrl };
     }

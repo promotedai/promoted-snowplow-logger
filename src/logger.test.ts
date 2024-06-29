@@ -378,7 +378,7 @@ describe('mergeBaseUserInfo', () => {
       runTestCase(
         { getUserInfo: () => ({ anonUserId: 'abc' }) },
         { userInfo: { anonUserId: 'efg' } },
-        { userInfo: { anonUserId: 'efg' } }
+        { userInfo: { anonUserId: 'efg' } },
       );
     });
 
@@ -386,7 +386,7 @@ describe('mergeBaseUserInfo', () => {
       runTestCase(
         { getUserInfo: () => ({ anonUserId: 'abc' }) },
         { userInfo: { userId: 'efg' } },
-        { userInfo: { anonUserId: 'abc', userId: 'efg' } }
+        { userInfo: { anonUserId: 'abc', userId: 'efg' } },
       );
     });
   });
@@ -438,7 +438,7 @@ describe('snowplowTrackers', () => {
 
   const runTrackersTestCase = (
     snowplowTrackers: Array<string> | string | undefined,
-    expectedTrackers: Array<string> | undefined
+    expectedTrackers: Array<string> | undefined,
   ) => {
     const snowplow = createMockSnowplow();
     const logger = createTestEventLogger({

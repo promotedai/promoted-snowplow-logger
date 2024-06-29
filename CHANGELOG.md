@@ -1,3 +1,10 @@
+## [8.2.1](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.2.0...v8.2.1) (2024-06-29)
+
+
+### Bug Fixes
+
+* an attempt to fix semantic release GHA ([#50](https://github.com/promotedai/promoted-snowplow-logger/issues/50)) ([619518e](https://github.com/promotedai/promoted-snowplow-logger/commit/619518ebf49439c48b3a4516fa9ae825e22cc502))
+
 # [8.2.0](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.1.2...v8.2.0) (2024-06-29)
 
 

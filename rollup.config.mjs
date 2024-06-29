@@ -1,9 +1,10 @@
 import copy from 'rollup-plugin-copy';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import typescript from 'rollup-plugin-typescript2';
 import del from 'rollup-plugin-delete';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
-import pkg from './package.json';
+import pkg from './package.json' assert { type: 'json' };;
+import ts from 'typescript';
 
 export default [
   {
@@ -12,7 +13,7 @@ export default [
     plugins: [
       del({ targets: 'dist/*' }),
       typescript({
-        typescript: require('typescript'),
+        typescript: ts,
       }),
       copy({
         targets: [
@@ -42,7 +43,7 @@ export default [
         file: `dist/${pkg.name}.umd.js`,
         format: 'umd',
         globals: {
-          '@snowplow/browser-tracker': '@snowplow/browser-tracker'
+          '@snowplow/browser-tracker': '@snowplow/browser-tracker',
         },
         sourcemap: true,
       },

@@ -61,7 +61,7 @@
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/npm": "^7.0.9",
     "@semantic-release/release-notes-generator": "^9.0.1",
-    "@size-limit/preset-small-lib": "^4.5.0",
+    "@size-limit/preset-small-lib": "^11.1.4",
     "@snowplow/browser-tracker": "^3.5.0",
     "@snowplow/tracker-core": "^3.5.0",
     "@types/jest": "^26.0.0",

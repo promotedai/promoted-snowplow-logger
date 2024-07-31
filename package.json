@@ -69,7 +69,7 @@
     "@snowplow/browser-tracker": "^3.24.0",
     "@snowplow/tracker-core": "^3.24.0",
     "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^7.14.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

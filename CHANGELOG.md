@@ -1,3 +1,10 @@
+## [8.2.3](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.2.2...v8.2.3) (2024-10-08)
+
+
+### Bug Fixes
+
+* codeql ([#135](https://github.com/promotedai/promoted-snowplow-logger/issues/135)) ([9546881](https://github.com/promotedai/promoted-snowplow-logger/commit/9546881343cb660322b7490cda63c6d2b9be658d))
+
 ## [8.2.2](https://github.com/promotedai/promoted-snowplow-logger/compare/v8.2.1...v8.2.2) (2024-10-07)
 
 
